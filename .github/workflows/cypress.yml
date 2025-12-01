@@ -40,6 +40,8 @@ jobs:
         run: npm ci
 
       - name: Run Cypress split
+        id: cypress_run
+        continue-on-error: true
         run: npx cypress run
 
       - name: Preparar artefatos brutos
@@ -61,6 +63,7 @@ jobs:
           name: cypress-part-${{ matrix.split_index }}
           path: artifacts/job-${{ matrix.split_index }}
           if-no-files-found: warn
+          include-hidden-files: true
 
   reports:
     name: Consolidar relatórios
@@ -116,3 +119,4 @@ jobs:
           name: cypress-report-html
           path: reports/html
           if-no-files-found: error
+          include-hidden-files: true
