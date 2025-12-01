@@ -49,7 +49,11 @@ jobs:
       - name: Run Cypress split
         id: cypress_run
         continue-on-error: true
-        run: npx cypress run
+        run: |
+          echo "Limpando reports/html e cypress/screenshots antes da execução..."
+          rm -rf reports/html || true
+          rm -rf cypress/screenshots || true
+          npx cypress run
 
       - name: Auditoria pós-Cypress
         if: ${{ always() }}
@@ -75,18 +79,20 @@ jobs:
           JOB_DIR="artifacts/job-${{ matrix.split_index }}"
           echo "JOB_DIR: $JOB_DIR"
           mkdir -p "$JOB_DIR"
-          mkdir -p "$JOB_DIR/reports/.jsons"
+          mkdir -p "$JOB_DIR/reports-html/.jsons"
           mkdir -p "$JOB_DIR/screenshots"
           if [ -d reports/html/.jsons ]; then
-            echo "Copiando JSONs de reports/html/.jsons para $JOB_DIR/reports/.jsons"
+            echo "Copiando JSONs de reports/html/.jsons para $JOB_DIR/reports-html/.jsons"
             ls reports/html/.jsons || true
-            cp reports/html/.jsons/report-generated*.json "$JOB_DIR/reports/.jsons/" || true
+            cp -R reports/html/.jsons/. "$JOB_DIR/reports-html/.jsons/" || true
           fi
           if [ -d cypress/screenshots ]; then
             echo "Copiando screenshots para $JOB_DIR/screenshots"
             ls -R cypress/screenshots || true
             cp -R cypress/screenshots/. "$JOB_DIR/screenshots/" || true
           fi
+          echo "=== CONTEÚDO FINAL DE $JOB_DIR ==="
+          ls -R "$JOB_DIR" || true
 
       - name: Upload parcial
         if: ${{ always() }}
@@ -144,10 +150,10 @@ jobs:
           mkdir -p cypress/screenshots
           shopt -s nullglob
           for part in downloaded/cypress-part-*; do
-            if [ -d "$part/reports/.jsons" ]; then
-              echo "Copiando JSONs de $part/reports/.jsons para reports/html/.jsons"
-              ls "$part/reports/.jsons" || true
-              cp -R "$part/reports/.jsons/." reports/html/.jsons/
+            if [ -d "$part/reports-html/.jsons" ]; then
+              echo "Copiando JSONs de $part/reports-html/.jsons para reports/html/.jsons"
+              ls "$part/reports-html/.jsons" || true
+              cp -R "$part/reports-html/.jsons/." reports/html/.jsons/
             fi
             if [ -d "$part/screenshots" ]; then
               echo "Copiando screenshots de $part/screenshots para cypress/screenshots"
