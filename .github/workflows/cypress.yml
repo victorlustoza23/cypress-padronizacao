@@ -78,21 +78,44 @@ jobs:
         run: |
           JOB_DIR="artifacts/job-${{ matrix.split_index }}"
           echo "JOB_DIR: $JOB_DIR"
-          mkdir -p "$JOB_DIR"
           mkdir -p "$JOB_DIR/reports-html/.jsons"
           mkdir -p "$JOB_DIR/screenshots"
+
+          echo "=== VERIFICANDO ORIGEM DOS JSONs ==="
           if [ -d reports/html/.jsons ]; then
-            echo "Copiando JSONs de reports/html/.jsons para $JOB_DIR/reports-html/.jsons"
-            ls reports/html/.jsons || true
-            cp -R reports/html/.jsons/. "$JOB_DIR/reports-html/.jsons/" || true
+            echo "Diretório reports/html/.jsons existe"
+            echo "Conteúdo de reports/html/.jsons:"
+            ls -la reports/html/.jsons || true
+            echo "Arquivos JSON encontrados na origem:"
+            find reports/html/.jsons -name "*.json" -type f || true
+            
+            echo "=== COPIANDO JSONs ==="
+            for json_file in reports/html/.jsons/*.json; do
+              if [ -f "$json_file" ]; then
+                echo "Copiando: $json_file -> $JOB_DIR/reports-html/.jsons/$(basename "$json_file")"
+                cp "$json_file" "$JOB_DIR/reports-html/.jsons/$(basename "$json_file")"
+              fi
+            done
+          else
+            echo "ERRO: Diretório reports/html/.jsons NÃO existe!"
           fi
+
+          echo "=== VERIFICANDO ORIGEM DOS SCREENSHOTS ==="
           if [ -d cypress/screenshots ]; then
-            echo "Copiando screenshots para $JOB_DIR/screenshots"
-            ls -R cypress/screenshots || true
-            cp -R cypress/screenshots/. "$JOB_DIR/screenshots/" || true
+            echo "Diretório cypress/screenshots existe"
+            echo "Copiando screenshots..."
+            cp -R cypress/screenshots/* "$JOB_DIR/screenshots/" 2>/dev/null || true
+          else
+            echo "Diretório cypress/screenshots NÃO existe (normal se não houver falhas)"
           fi
-          echo "=== CONTEÚDO FINAL DE $JOB_DIR ==="
-          ls -R "$JOB_DIR" || true
+
+          echo "=== VERIFICAÇÃO FINAL DOS ARQUIVOS COPIADOS ==="
+          echo "Conteúdo de $JOB_DIR/reports-html/.jsons após cópia:"
+          ls -la "$JOB_DIR/reports-html/.jsons" || true
+          echo "JSONs encontrados no destino:"
+          find "$JOB_DIR/reports-html/.jsons" -name "*.json" -type f || true
+          echo "Estrutura completa de $JOB_DIR:"
+          find "$JOB_DIR" -type f || true
 
       - name: Upload parcial
         if: ${{ always() }}
@@ -148,21 +171,43 @@ jobs:
           rm -rf reports/html
           mkdir -p reports/html/.jsons
           mkdir -p cypress/screenshots
-          shopt -s nullglob
+
+          echo "=== PROCESSANDO CADA PARTE BAIXADA ==="
           for part in downloaded/cypress-part-*; do
-            if [ -d "$part/reports-html/.jsons" ]; then
-              echo "Copiando JSONs de $part/reports-html/.jsons para reports/html/.jsons"
-              ls "$part/reports-html/.jsons" || true
-              cp -R "$part/reports-html/.jsons/." reports/html/.jsons/
-            fi
-            if [ -d "$part/screenshots" ]; then
-              echo "Copiando screenshots de $part/screenshots para cypress/screenshots"
-              ls -R "$part/screenshots" || true
-              cp -R "$part/screenshots/." cypress/screenshots/
+            if [ -d "$part" ]; then
+              echo "Processando: $part"
+              
+              if [ -d "$part/reports-html/.jsons" ]; then
+                echo "  Diretório $part/reports-html/.jsons existe"
+                echo "  Conteúdo:"
+                ls -la "$part/reports-html/.jsons" || true
+                
+                echo "  Copiando JSONs de $part/reports-html/.jsons para reports/html/.jsons"
+                for json_file in "$part/reports-html/.jsons"/*.json; do
+                  if [ -f "$json_file" ]; then
+                    filename=$(basename "$json_file")
+                    echo "    Copiando: $filename"
+                    cp "$json_file" "reports/html/.jsons/$filename"
+                  fi
+                done
+              else
+                echo "  AVISO: $part/reports-html/.jsons não existe"
+              fi
+              
+              if [ -d "$part/screenshots" ]; then
+                echo "  Copiando screenshots de $part/screenshots"
+                cp -R "$part/screenshots"/* cypress/screenshots/ 2>/dev/null || true
+              fi
             fi
           done
-          echo "=== LISTA FINAL reports/html/.jsons ==="
-          ls -R reports/html/.jsons || true
+
+          echo "=== VERIFICAÇÃO FINAL DOS JSONs CONSOLIDADOS ==="
+          echo "Conteúdo de reports/html/.jsons:"
+          ls -la reports/html/.jsons || true
+          echo "Total de JSONs encontrados:"
+          find reports/html/.jsons -name "*.json" -type f | wc -l || echo "0"
+          echo "Lista completa de JSONs:"
+          find reports/html/.jsons -name "*.json" -type f || true
 
       - name: Gerar relatório consolidado
         run: |
