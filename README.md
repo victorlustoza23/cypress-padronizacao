@@ -84,6 +84,24 @@ package.json             # Scripts e dependências
 Os relatórios ficam disponíveis em `reports/html`. É possível publicá-los em
 pipelines ou anexá-los manualmente quando necessário.
 
+## Integração contínua (GitHub Actions)
+
+O workflow `.github/workflows/cypress.yml` roda automaticamente em pushes e
+pull requests. Ele divide a suíte em três partes por meio do `cypress-split`,
+executando cada fatia em paralelo. Ao final de cada job, os JSONs do
+mochawesome e os screenshots são enviados como artefatos (`cypress-part-*`).
+
+Um job dedicado consolida esses artefatos, executa `npm run merge-reports`,
+`npm run fix-reports` e `npm run generate-report`, e publica o artefato
+`cypress-report-html` com o HTML final e os assets necessários.
+
+Para baixar o relatório consolidado:
+
+1. Acesse o run desejado em GitHub Actions.
+2. Faça download de `cypress-report-html`.
+3. Extraia o conteúdo e abra `reports/html/report-generated.html` (ou
+   `merged-report.html`) no navegador para visualizar o resultado.
+
 ## Execução filtrada por tags
 
 Graças ao `@cypress/grep`, você pode usar `--env grepTags="@login"`

@@ -1,0 +1,112 @@
+name: Cypress E2E
+
+on:
+  push:
+    branches:
+      - 'master'
+
+jobs:
+  tests:
+    name: Spec split ${{ matrix.split_label }}/3
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - split_label: 1
+            split_index: 0
+          - split_label: 2
+            split_index: 1
+          - split_label: 3
+            split_index: 2
+    env:
+      SPLIT: 3
+      SPLIT_INDEX: ${{ matrix.split_index }}
+      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Cypress split
+        run: npx cypress run
+
+      - name: Preparar artefatos brutos
+        if: ${{ always() }}
+        run: |
+          JOB_DIR="artifacts/job-${{ matrix.split_index }}"
+          mkdir -p "$JOB_DIR"
+          if [ -d reports/html ]; then
+            cp -R reports/html "$JOB_DIR/reports-html"
+          fi
+          if [ -d cypress/screenshots ]; then
+            cp -R cypress/screenshots "$JOB_DIR/screenshots"
+          fi
+
+      - name: Upload parcial
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-part-${{ matrix.split_index }}
+          path: artifacts/job-${{ matrix.split_index }}
+          if-no-files-found: warn
+
+  reports:
+    name: Consolidar relatórios
+    needs: tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Baixar artefatos
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded
+
+      - name: Organizar arquivos do mochawesome
+        run: |
+          rm -rf reports/html
+          mkdir -p reports/html/.jsons
+          mkdir -p cypress/screenshots
+          shopt -s nullglob
+          for part in downloaded/cypress-part-*; do
+            if [ -d "$part/reports-html/.jsons" ]; then
+              cp -R "$part/reports-html/.jsons/." reports/html/.jsons/
+            fi
+            if [ -d "$part/screenshots" ]; then
+              cp -R "$part/screenshots/." cypress/screenshots/
+            fi
+          done
+
+      - name: Gerar relatório consolidado
+        run: |
+          npm run merge-reports
+          npm run fix-reports
+          npm run generate-report
+
+      - name: Upload relatório final
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-report-html
+          path: reports/html
+          if-no-files-found: error
