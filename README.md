@@ -76,6 +76,8 @@ package.json             # Scripts e dependências
 
 ## Fluxo de relatórios
 
+### Execução local
+
 1. Rodar os testes (`npm run test:headless` ou similar).
 2. `npm run merge-reports` para juntar todos os `.json` do mochawesome.
 3. `npm run fix-reports` (opcional, mas recomendado) para ajustar screenshots.
@@ -84,23 +86,54 @@ package.json             # Scripts e dependências
 Os relatórios ficam disponíveis em `reports/html`. É possível publicá-los em
 pipelines ou anexá-los manualmente quando necessário.
 
+### Execução no GitHub Actions
+
+No CI/CD, o processo é automatizado. O workflow divide a suíte em três partes
+executadas em paralelo. Cada parte gera seu próprio JSON de relatório, que é
+enviado como artefato. Um job dedicado consolida todos os JSONs, corrige os
+caminhos dos screenshots e gera um único relatório HTML final contendo **todos
+os testes executados em todos os splits**.
+
+O relatório consolidado (`merged-report.html`) inclui:
+- Resultados de todas as specs executadas (cart, checkout, login, etc.)
+- Screenshots de falhas de todos os splits
+- Estatísticas consolidadas (total de testes, passou, falhou, etc.)
+- Timeline completa da execução
+
+Para mais detalhes sobre o funcionamento do CI, consulte o
+[TUTORIAL-GITHUB.md](./TUTORIAL-GITHUB.md).
+
 ## Integração contínua (GitHub Actions)
 
-O workflow `.github/workflows/cypress.yml` roda automaticamente em pushes e
-pull requests. Ele divide a suíte em três partes por meio do `cypress-split`,
-executando cada fatia em paralelo. Ao final de cada job, os JSONs do
-mochawesome e os screenshots são enviados como artefatos (`cypress-part-*`).
+O workflow `.github/workflows/cypress.yml` roda automaticamente em pushes para
+a branch `master`. Ele divide a suíte em três partes por meio do `cypress-split`,
+executando cada fatia em paralelo em runners separados.
 
-Um job dedicado consolida esses artefatos, executa `npm run merge-reports`,
-`npm run fix-reports` e `npm run generate-report`, e publica o artefato
-`cypress-report-html` com o HTML final e os assets necessários.
+### Como funciona
 
-Para baixar o relatório consolidado:
+1. **Execução paralela**: Três jobs (`Spec split 1/3`, `Spec split 2/3`,
+   `Spec split 3/3`) executam simultaneamente, cada um rodando uma parte dos
+   testes.
+2. **Coleta de artefatos**: Cada job gera um JSON de relatório e screenshots
+   (se houver falhas), que são enviados como artefatos nomeados
+   `cypress-part-0`, `cypress-part-1`, `cypress-part-2`.
+3. **Consolidação**: Um job dedicado (`Consolidar relatórios`) baixa todos os
+   artefatos, renomeia os JSONs para evitar conflitos, consolida tudo em um
+   único relatório HTML e publica como `cypress-report-html`.
 
-1. Acesse o run desejado em GitHub Actions.
-2. Faça download de `cypress-report-html`.
-3. Extraia o conteúdo e abra `reports/html/report-generated.html` (ou
-   `merged-report.html`) no navegador para visualizar o resultado.
+### Como acessar o relatório
+
+1. Acesse o run desejado em **GitHub Actions**.
+2. Role até o final da página e localize a seção **Artifacts**.
+3. Faça download de `cypress-report-html`.
+4. Extraia o ZIP e abra `reports/html/merged-report.html` no navegador.
+
+O relatório consolidado contém todos os testes de todos os splits, permitindo
+visualizar a execução completa em um único lugar, mesmo quando os testes foram
+executados em paralelo.
+
+Para entender em detalhes cada etapa do CI, consulte o
+[TUTORIAL-GITHUB.md](./TUTORIAL-GITHUB.md).
 
 ## Execução filtrada por tags
 

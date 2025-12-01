@@ -14,6 +14,7 @@
     "cy:split:1": "SPLIT=3 SPLIT_INDEX=0 npx cypress run",
     "cy:split:2": "SPLIT=3 SPLIT_INDEX=1 npx cypress run",
     "cy:split:3": "SPLIT=3 SPLIT_INDEX=2 npx cypress run",
+    "cy:split:all": "concurrently \"npm run cy:split:1\" \"npm run cy:split:2\" \"npm run cy:split:3\"",
     "merge-reports": "npx mochawesome-merge reports/html/.jsons/*.json -o reports/html/merged-report.json",
     "fix-reports": "npx cypress-mochawesome-screenshot-fixer reports/html/merged-report.json",
     "generate-report": "npx marge reports/html/merged-report.json -o reports/html",
@@ -26,6 +27,7 @@
   "dependencies": {
     "@cypress/grep": "^5.0.0",
     "@faker-js/faker": "^10.1.0",
+    "concurrently": "^9.2.1",
     "cypress": "^15.7.0",
     "cypress-mochawesome-reporter": "^4.0.2",
     "cypress-mochawesome-screenshot-fixer": "^1.0.3",
