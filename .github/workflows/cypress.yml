@@ -27,6 +27,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Contexto inicial
+        run: |
+          echo "=== CONTEXTO INICIAL JOB SPLIT ${SPLIT_INDEX} ==="
+          pwd
+          echo "Conteúdo do diretório:"
+          ls -R
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -44,17 +51,40 @@ jobs:
         continue-on-error: true
         run: npx cypress run
 
+      - name: Auditoria pós-Cypress
+        if: ${{ always() }}
+        run: |
+          echo "=== LISTANDO reports/html ==="
+          if [ -d reports/html ]; then
+            ls -R reports/html || true
+            echo "Arquivos JSON encontrados:"
+            find reports/html -name "*.json" -maxdepth 3 || true
+          else
+            echo "Diretório reports/html NÃO existe"
+          fi
+          echo "=== LISTANDO cypress/screenshots ==="
+          if [ -d cypress/screenshots ]; then
+            ls -R cypress/screenshots || true
+          else
+            echo "Diretório cypress/screenshots NÃO existe"
+          fi
+
       - name: Preparar artefatos brutos
         if: ${{ always() }}
         run: |
           JOB_DIR="artifacts/job-${{ matrix.split_index }}"
+          echo "JOB_DIR: $JOB_DIR"
           mkdir -p "$JOB_DIR"
           mkdir -p "$JOB_DIR/reports/.jsons"
           mkdir -p "$JOB_DIR/screenshots"
           if [ -d reports/html/.jsons ]; then
+            echo "Copiando JSONs de reports/html/.jsons para $JOB_DIR/reports/.jsons"
+            ls reports/html/.jsons || true
             cp reports/html/.jsons/report-generated*.json "$JOB_DIR/reports/.jsons/" || true
           fi
           if [ -d cypress/screenshots ]; then
+            echo "Copiando screenshots para $JOB_DIR/screenshots"
+            ls -R cypress/screenshots || true
             cp -R cypress/screenshots/. "$JOB_DIR/screenshots/" || true
           fi
 
@@ -76,6 +106,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Contexto inicial consolidação
+        run: |
+          echo "=== CONTEXTO INICIAL CONSOLIDAÇÃO ==="
+          pwd
+          echo "Conteúdo do diretório:"
+          ls -R
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -93,6 +130,13 @@ jobs:
         with:
           path: downloaded
 
+      - name: Auditoria artefatos baixados
+        run: |
+          echo "=== LISTANDO downloaded ==="
+          ls -R downloaded || true
+          echo "Arquivos JSON de cada parte:"
+          find downloaded -name "*.json" || true
+
       - name: Organizar arquivos do mochawesome
         run: |
           rm -rf reports/html
@@ -101,18 +145,30 @@ jobs:
           shopt -s nullglob
           for part in downloaded/cypress-part-*; do
             if [ -d "$part/reports/.jsons" ]; then
+              echo "Copiando JSONs de $part/reports/.jsons para reports/html/.jsons"
+              ls "$part/reports/.jsons" || true
               cp -R "$part/reports/.jsons/." reports/html/.jsons/
             fi
             if [ -d "$part/screenshots" ]; then
+              echo "Copiando screenshots de $part/screenshots para cypress/screenshots"
+              ls -R "$part/screenshots" || true
               cp -R "$part/screenshots/." cypress/screenshots/
             fi
           done
+          echo "=== LISTA FINAL reports/html/.jsons ==="
+          ls -R reports/html/.jsons || true
 
       - name: Gerar relatório consolidado
         run: |
+          echo "JSONs presentes antes do merge:"
+          find reports/html/.jsons -name "*.json" || true
           npm run merge-reports
           npm run fix-reports
           npm run generate-report
+          echo "=== ESTRUTURA FINAL DE REPORTS/HTML ==="
+          ls -R reports/html || true
+          echo "Arquivos HTML gerados:"
+          find reports/html -maxdepth 2 -name "*.html" || true
 
       - name: Upload relatório final
         if: ${{ always() }}
