@@ -1,0 +1,112 @@
+{
+  "stats": {
+    "suites": 1,
+    "tests": 1,
+    "passes": 0,
+    "pending": 0,
+    "failures": 1,
+    "start": "2025-12-01T13:14:19.761Z",
+    "end": "2025-12-01T13:14:20.589Z",
+    "duration": 828,
+    "testsRegistered": 1,
+    "passPercent": 0,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false
+  },
+  "results": [
+    {
+      "uuid": "fcfc5b84-c6ca-4d24-aa17-6ba905f5d16c",
+      "title": "",
+      "fullFile": "cypress/e2e/cashback.cy.js",
+      "file": "cypress/e2e/cashback.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "b642ece9-cf75-43a3-b37f-0cc95f3a6e69",
+          "title": "Cashback",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Valida geração do relatório de cashback",
+              "fullTitle": "Cashback Valida geração do relatório de cashback",
+              "timedOut": null,
+              "duration": 235,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"/cashback.cy.js/Cashback -- Valida geração do relatório de cashback (failed).png\"\n    ],\n    [\n      \"/cashback.cy.js/Cashback -- Valida geração do relatório de cashback (failed) (attempt 2).png\"\n    ],\n    [\n      \"/cashback.cy.js/Cashback -- Valida geração do relatório de cashback -- before each hook (failed) (attempt 3).png\"\n    ]\n  ]\n}",
+              "code": "cy.downloadingReport();\ncy.contains('span', 'Processando seu relatório...').should('be.visible');\ncy.contains('span', 'Relatório gerado!', {\n  timeout: 30000\n}).should('be.visible');\ncy.verifyDownloadedFile('cashback');",
+              "err": {
+                "message": "CypressError: `cy.visit()` failed trying to load:\n\n/home\n\nWe failed looking for this file at the path:\n\n/home/victor-lustoza/Projetos/cypress-padronizacao/home\n\nThe internal Cypress web server responded with:\n\n  > 404: Not Found\n\nBecause this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Cashback`",
+                "estack": "CypressError: `cy.visit()` failed trying to load:\n\n/home\n\nWe failed looking for this file at the path:\n\n/home/victor-lustoza/Projetos/cypress-padronizacao/home\n\nThe internal Cypress web server responded with:\n\n  > 404: Not Found\n\nBecause this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Cashback`\n    at <unknown> (http://localhost:38183/__cypress/runner/cypress_runner.js:134622:76)\n    at visitFailedByErr (http://localhost:38183/__cypress/runner/cypress_runner.js:134212:12)\n    at <unknown> (http://localhost:38183/__cypress/runner/cypress_runner.js:134605:13)\n    at tryCatcher (http://localhost:38183/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (http://localhost:38183/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (http://localhost:38183/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromise0 (http://localhost:38183/__cypress/runner/cypress_runner.js:1591:10)\n    at Promise._settlePromises (http://localhost:38183/__cypress/runner/cypress_runner.js:1667:18)\n    at _drainQueueStep (http://localhost:38183/__cypress/runner/cypress_runner.js:2377:12)\n    at _drainQueue (http://localhost:38183/__cypress/runner/cypress_runner.js:2370:9)\n    at Async._drainQueues (http://localhost:38183/__cypress/runner/cypress_runner.js:2386:5)\n    at Async.drainQueues (http://localhost:38183/__cypress/runner/cypress_runner.js:2256:14)\nFrom Your Spec Code:\n    at Context.eval (webpack://cypress-padronizacao/./cypress/e2e/cashback.cy.js:3:7)",
+                "diff": null
+              },
+              "uuid": "49b3aa07-1397-4d41-8f73-ee86e8a413af",
+              "parentUUID": "b642ece9-cf75-43a3-b37f-0cc95f3a6e69",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "49b3aa07-1397-4d41-8f73-ee86e8a413af"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 235,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "report-generated",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "reports/html/.jsons",
+        "charts": true,
+        "embeddedScreenshots": true,
+        "overwrite": false,
+        "json": true,
+        "reportFilename": "report-generated",
+        "html": false
+      },
+      "version": "6.3.2"
+    }
+  }
+}

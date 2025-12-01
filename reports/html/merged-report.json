@@ -1,0 +1,310 @@
+{
+  "stats": {
+    "suites": 4,
+    "tests": 5,
+    "passes": 3,
+    "pending": 0,
+    "failures": 2,
+    "testsRegistered": 5,
+    "passPercent": 60,
+    "pendingPercent": 0,
+    "other": 0,
+    "hasOther": false,
+    "skipped": 0,
+    "hasSkipped": false,
+    "start": "2025-12-01T13:14:13.111Z",
+    "end": "2025-12-01T13:14:30.934Z",
+    "duration": 17823
+  },
+  "results": [
+    {
+      "uuid": "9a4c512a-3e53-4f0c-a1dd-b02c3a497117",
+      "title": "",
+      "fullFile": "cypress/e2e/cart.cy.js",
+      "file": "cypress/e2e/cart.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "4ad04ee5-ec24-4211-b03b-49608132ad07",
+          "title": "Cart example spec",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Visit example page cart",
+              "fullTitle": "Cart example spec Visit example page cart",
+              "timedOut": null,
+              "duration": 2078,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit(\"https://example.cypress.io\");\ncy.url().should(\"include\", \"cypress.io\");",
+              "err": {},
+              "uuid": "0b2e0410-9665-45a0-a99d-d7052393a06e",
+              "parentUUID": "4ad04ee5-ec24-4211-b03b-49608132ad07",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "0b2e0410-9665-45a0-a99d-d7052393a06e"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 2078,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    },
+    {
+      "uuid": "fd140366-e956-4d8c-945c-3b2bd8b1a5ed",
+      "title": "",
+      "fullFile": "cypress/e2e/checkout.cy.js",
+      "file": "cypress/e2e/checkout.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "41678174-1dd0-4e1b-ae12-228eacd915cd",
+          "title": "Checkout example spec",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Visit example page checkout",
+              "fullTitle": "Checkout example spec Visit example page checkout",
+              "timedOut": null,
+              "duration": 2101,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit(\"https://example.cypress.io\");\ncy.url().should(\"include\", \"cypress.io\");",
+              "err": {},
+              "uuid": "df8f72b2-5889-4b4f-b692-6441985b7365",
+              "parentUUID": "41678174-1dd0-4e1b-ae12-228eacd915cd",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "df8f72b2-5889-4b4f-b692-6441985b7365"
+          ],
+          "failures": [],
+          "pending": [],
+          "skipped": [],
+          "duration": 2101,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    },
+    {
+      "uuid": "fcfc5b84-c6ca-4d24-aa17-6ba905f5d16c",
+      "title": "",
+      "fullFile": "cypress/e2e/cashback.cy.js",
+      "file": "cypress/e2e/cashback.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "b642ece9-cf75-43a3-b37f-0cc95f3a6e69",
+          "title": "Cashback",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Valida geração do relatório de cashback",
+              "fullTitle": "Cashback Valida geração do relatório de cashback",
+              "timedOut": null,
+              "duration": 235,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"/cashback.cy.js/Cashback -- Valida geração do relatório de cashback (failed).png\"\n    ],\n    [\n      \"/cashback.cy.js/Cashback -- Valida geração do relatório de cashback (failed) (attempt 2).png\"\n    ],\n    [\n      \"/cashback.cy.js/Cashback -- Valida geração do relatório de cashback -- before each hook (failed) (attempt 3).png\"\n    ]\n  ]\n}",
+              "code": "cy.downloadingReport();\ncy.contains('span', 'Processando seu relatório...').should('be.visible');\ncy.contains('span', 'Relatório gerado!', {\n  timeout: 30000\n}).should('be.visible');\ncy.verifyDownloadedFile('cashback');",
+              "err": {
+                "message": "CypressError: `cy.visit()` failed trying to load:\n\n/home\n\nWe failed looking for this file at the path:\n\n/home/victor-lustoza/Projetos/cypress-padronizacao/home\n\nThe internal Cypress web server responded with:\n\n  > 404: Not Found\n\nBecause this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Cashback`",
+                "estack": "CypressError: `cy.visit()` failed trying to load:\n\n/home\n\nWe failed looking for this file at the path:\n\n/home/victor-lustoza/Projetos/cypress-padronizacao/home\n\nThe internal Cypress web server responded with:\n\n  > 404: Not Found\n\nBecause this error occurred during a `before each` hook we are skipping the remaining tests in the current suite: `Cashback`\n    at <unknown> (http://localhost:38183/__cypress/runner/cypress_runner.js:134622:76)\n    at visitFailedByErr (http://localhost:38183/__cypress/runner/cypress_runner.js:134212:12)\n    at <unknown> (http://localhost:38183/__cypress/runner/cypress_runner.js:134605:13)\n    at tryCatcher (http://localhost:38183/__cypress/runner/cypress_runner.js:1777:23)\n    at Promise._settlePromiseFromHandler (http://localhost:38183/__cypress/runner/cypress_runner.js:1489:31)\n    at Promise._settlePromise (http://localhost:38183/__cypress/runner/cypress_runner.js:1546:18)\n    at Promise._settlePromise0 (http://localhost:38183/__cypress/runner/cypress_runner.js:1591:10)\n    at Promise._settlePromises (http://localhost:38183/__cypress/runner/cypress_runner.js:1667:18)\n    at _drainQueueStep (http://localhost:38183/__cypress/runner/cypress_runner.js:2377:12)\n    at _drainQueue (http://localhost:38183/__cypress/runner/cypress_runner.js:2370:9)\n    at Async._drainQueues (http://localhost:38183/__cypress/runner/cypress_runner.js:2386:5)\n    at Async.drainQueues (http://localhost:38183/__cypress/runner/cypress_runner.js:2256:14)\nFrom Your Spec Code:\n    at Context.eval (webpack://cypress-padronizacao/./cypress/e2e/cashback.cy.js:3:7)",
+                "diff": null
+              },
+              "uuid": "49b3aa07-1397-4d41-8f73-ee86e8a413af",
+              "parentUUID": "b642ece9-cf75-43a3-b37f-0cc95f3a6e69",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [],
+          "failures": [
+            "49b3aa07-1397-4d41-8f73-ee86e8a413af"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 235,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    },
+    {
+      "uuid": "294845dc-9672-4cdc-ae75-940e9769e153",
+      "title": "",
+      "fullFile": "cypress/e2e/login.cy.js",
+      "file": "cypress/e2e/login.cy.js",
+      "beforeHooks": [],
+      "afterHooks": [],
+      "tests": [],
+      "suites": [
+        {
+          "uuid": "e51c79e6-43fa-46b5-a061-70a61f0b8ab5",
+          "title": "Login example spec",
+          "fullFile": "",
+          "file": "",
+          "beforeHooks": [],
+          "afterHooks": [],
+          "tests": [
+            {
+              "title": "Visit example page login",
+              "fullTitle": "Login example spec Visit example page login",
+              "timedOut": null,
+              "duration": 4661,
+              "state": "failed",
+              "speed": null,
+              "pass": false,
+              "fail": true,
+              "pending": false,
+              "context": "{\n  \"title\": \"cypress-mochawesome-reporter-screenshots\",\n  \"value\": [\n    [\n      \"/login.cy.js/Login example spec -- Visit example page login (failed).png\"\n    ],\n    [\n      \"/login.cy.js/Login example spec -- Visit example page login (failed) (attempt 2).png\"\n    ],\n    [\n      \"/login.cy.js/Login example spec -- Visit example page login (failed) (attempt 3).png\"\n    ]\n  ]\n}",
+              "code": "cy.visit(\"https://example.cypress.io\");\ncy.url().should(\"include\", \"cypress.ios\");",
+              "err": {
+                "message": "AssertionError: Timed out retrying after 4000ms: expected 'https://example.cypress.io/' to include 'cypress.ios'",
+                "estack": "AssertionError: Timed out retrying after 4000ms: expected 'https://example.cypress.io/' to include 'cypress.ios'\n    at Context.eval (webpack://cypress-padronizacao/./cypress/e2e/login.cy.js:4:13)",
+                "diff": null
+              },
+              "uuid": "dd1ef784-001a-444e-9c37-92cf048e1b9f",
+              "parentUUID": "e51c79e6-43fa-46b5-a061-70a61f0b8ab5",
+              "isHook": false,
+              "skipped": false
+            },
+            {
+              "title": "Visit example page login",
+              "fullTitle": "Login example spec Visit example page login",
+              "timedOut": null,
+              "duration": 222,
+              "state": "passed",
+              "speed": "fast",
+              "pass": true,
+              "fail": false,
+              "pending": false,
+              "context": null,
+              "code": "cy.visit(\"https://example.cypress.io\");\ncy.url().should(\"include\", \"cypress.io\");",
+              "err": {},
+              "uuid": "32113cb8-d1f4-43e8-a1c7-b3ded9587680",
+              "parentUUID": "e51c79e6-43fa-46b5-a061-70a61f0b8ab5",
+              "isHook": false,
+              "skipped": false
+            }
+          ],
+          "suites": [],
+          "passes": [
+            "32113cb8-d1f4-43e8-a1c7-b3ded9587680"
+          ],
+          "failures": [
+            "dd1ef784-001a-444e-9c37-92cf048e1b9f"
+          ],
+          "pending": [],
+          "skipped": [],
+          "duration": 4883,
+          "root": false,
+          "rootEmpty": false,
+          "_timeout": 2000
+        }
+      ],
+      "passes": [],
+      "failures": [],
+      "pending": [],
+      "skipped": [],
+      "duration": 0,
+      "root": true,
+      "rootEmpty": true,
+      "_timeout": 2000
+    }
+  ],
+  "meta": {
+    "mocha": {
+      "version": "7.2.0"
+    },
+    "mochawesome": {
+      "options": {
+        "quiet": false,
+        "reportFilename": "report-generated",
+        "saveHtml": false,
+        "saveJson": true,
+        "consoleReporter": "spec",
+        "useInlineDiffs": false,
+        "code": true
+      },
+      "version": "7.1.4"
+    },
+    "marge": {
+      "options": {
+        "reportDir": "reports/html/.jsons",
+        "charts": true,
+        "embeddedScreenshots": true,
+        "overwrite": false,
+        "json": true,
+        "reportFilename": "report-generated",
+        "html": false
+      },
+      "version": "6.3.2"
+    }
+  }
+}
