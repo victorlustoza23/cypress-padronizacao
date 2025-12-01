@@ -49,11 +49,13 @@ jobs:
         run: |
           JOB_DIR="artifacts/job-${{ matrix.split_index }}"
           mkdir -p "$JOB_DIR"
-          if [ -d reports/html ]; then
-            cp -R reports/html "$JOB_DIR/reports-html"
+          mkdir -p "$JOB_DIR/reports/.jsons"
+          mkdir -p "$JOB_DIR/screenshots"
+          if [ -d reports/html/.jsons ]; then
+            cp reports/html/.jsons/report-generated*.json "$JOB_DIR/reports/.jsons/" || true
           fi
           if [ -d cypress/screenshots ]; then
-            cp -R cypress/screenshots "$JOB_DIR/screenshots"
+            cp -R cypress/screenshots/. "$JOB_DIR/screenshots/" || true
           fi
 
       - name: Upload parcial
@@ -98,8 +100,8 @@ jobs:
           mkdir -p cypress/screenshots
           shopt -s nullglob
           for part in downloaded/cypress-part-*; do
-            if [ -d "$part/reports-html/.jsons" ]; then
-              cp -R "$part/reports-html/.jsons/." reports/html/.jsons/
+            if [ -d "$part/reports/.jsons" ]; then
+              cp -R "$part/reports/.jsons/." reports/html/.jsons/
             fi
             if [ -d "$part/screenshots" ]; then
               cp -R "$part/screenshots/." cypress/screenshots/
