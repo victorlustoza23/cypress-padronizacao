@@ -90,10 +90,13 @@ jobs:
             find reports/html/.jsons -name "*.json" -type f || true
             
             echo "=== COPIANDO JSONs ==="
+            PART_INDEX="${{ matrix.split_index }}"
             for json_file in reports/html/.jsons/*.json; do
               if [ -f "$json_file" ]; then
-                echo "Copiando: $json_file -> $JOB_DIR/reports-html/.jsons/$(basename "$json_file")"
-                cp "$json_file" "$JOB_DIR/reports-html/.jsons/$(basename "$json_file")"
+                filename=$(basename "$json_file")
+                dest_file="$JOB_DIR/reports-html/.jsons/${PART_INDEX}-${filename}"
+                echo "Copiando: $json_file -> $dest_file"
+                cp "$json_file" "$dest_file"
               fi
             done
           else
@@ -183,11 +186,13 @@ jobs:
                 ls -la "$part/reports-html/.jsons" || true
                 
                 echo "  Copiando JSONs de $part/reports-html/.jsons para reports/html/.jsons"
+                PART_NAME=$(basename "$part")
                 for json_file in "$part/reports-html/.jsons"/*.json; do
                   if [ -f "$json_file" ]; then
                     filename=$(basename "$json_file")
-                    echo "    Copiando: $filename"
-                    cp "$json_file" "reports/html/.jsons/$filename"
+                    dest_file="reports/html/.jsons/${PART_NAME}-${filename}"
+                    echo "    Copiando: $filename -> $dest_file"
+                    cp "$json_file" "$dest_file"
                   fi
                 done
               else
