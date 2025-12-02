@@ -18,8 +18,8 @@ gerar relatórios HTML unificados após cada execução.
 
 ## Pré-requisitos
 
-- Node.js 18+ (recomendado LTS).
-- npm 9+ (vem com o Node mais recente).
+- Node.js v24.11.1 (recomendado LTS).
+- npm 11.6.3 (vem com o Node mais recente).
 - Acesso ao Git e ao repositório remoto.
 
 ## Como executar
@@ -86,23 +86,6 @@ package.json             # Scripts e dependências
 Os relatórios ficam disponíveis em `reports/html`. É possível publicá-los em
 pipelines ou anexá-los manualmente quando necessário.
 
-### Execução no GitHub Actions
-
-No CI/CD, o processo é automatizado. O workflow divide a suíte em três partes
-executadas em paralelo. Cada parte gera seu próprio JSON de relatório, que é
-enviado como artefato. Um job dedicado consolida todos os JSONs, corrige os
-caminhos dos screenshots e gera um único relatório HTML final contendo **todos
-os testes executados em todos os splits**.
-
-O relatório consolidado (`merged-report.html`) inclui:
-- Resultados de todas as specs executadas (cart, checkout, login, etc.)
-- Screenshots de falhas de todos os splits
-- Estatísticas consolidadas (total de testes, passou, falhou, etc.)
-- Timeline completa da execução
-
-Para mais detalhes sobre o funcionamento do CI, consulte o
-[TUTORIAL-GITHUB.md](./TUTORIAL-GITHUB.md).
-
 ## Integração contínua (GitHub Actions)
 
 O workflow `.github/workflows/cypress.yml` roda automaticamente em pushes para
@@ -132,8 +115,10 @@ O relatório consolidado contém todos os testes de todos os splits, permitindo
 visualizar a execução completa em um único lugar, mesmo quando os testes foram
 executados em paralelo.
 
-Para entender em detalhes cada etapa do CI, consulte o
-[TUTORIAL-GITHUB.md](./TUTORIAL-GITHUB.md).
+1. Acesse o run desejado em GitHub Actions.
+2. Faça download de `cypress-report-html`.
+3. Extraia o conteúdo e abra `reports/html/report-generated.html` (ou
+   `merged-report.html`) no navegador para visualizar o resultado.
 
 ## Execução filtrada por tags
 
