@@ -1,16 +1,18 @@
 describe('Login example spec', () => {
-  it('Visit example page login', { tags: '@login' }, () => {
-    cy.visit('https://example.cypress.io')
-    cy.url().should('include', 'cypress.ios')
-  })
+	const user = Cypress.env('USER_EMAIL')
+	const password = Cypress.env('USER_PASSWORD')
+	const options = { cacheSession: false }
+	it('Validate login on MadeiraMadeira', { tags: '@login' }, () => {
+		cy.gui_login(user, password, options)
 
-  it('Visit example page login 2', { tags: '@login' }, () => {
-    cy.visit('https://example.cypress.io')
-    cy.url().should('include', 'cypress.io')
-  })
+		cy.contains('Minha Conta').should('be.visible').click()
+		cy.contains('span', 'Sair').should('be.visible')
+	})
 
-  it('Visit example page login 3', { tags: '@login' }, () => {
-    cy.visit('https://example.cypress.io')
-    cy.url().should('include', 'cypress.io')
-  })
+	it('Validate login on MadeiraMadeira', { tags: '@outra-tag' }, () => {
+		cy.gui_login(user, password, options)
+
+		cy.contains('Minha Conta').should('be.visible').click()
+		cy.contains('span', 'Sairr').should('be.visible')
+	})
 })
