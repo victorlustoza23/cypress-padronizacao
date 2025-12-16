@@ -76,8 +76,8 @@ automaticamente.
     `cypress-mochawesome-reporter` em `reports/html/.jsons`.
 -   **`npm run generate-report`**: gera o HTML final de relatório a partir
     do JSON consolidado.
--   **`npm run post-test`**: encadeia `merge-reports`, `fix-reports` e
-    `generate-report` após uma execução headless completa.
+-   **`npm run post-test`**: encadeia `merge-reports` e `generate-report` após
+    uma execução headless completa.
 
 ## Estrutura relevante do projeto
 
