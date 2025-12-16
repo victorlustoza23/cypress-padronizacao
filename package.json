@@ -28,7 +28,6 @@
 		"concurrently": "^9.2.1",
 		"cypress": "^15.7.0",
 		"cypress-mochawesome-reporter": "^4.0.2",
-		"cypress-mochawesome-screenshot-fixer": "^1.0.3",
 		"cypress-plugin-api": "^2.11.2",
 		"cypress-split": "^1.24.25",
 		"find-cypress-specs": "^1.54.8"
