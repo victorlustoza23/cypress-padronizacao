@@ -28,6 +28,23 @@ automaticamente.
 -   npm 11.6.3 (vem com o Node mais recente).
 -   Acesso ao Git e ao repositório remoto.
 
+### Configuração de variáveis de ambiente
+
+1. **Copie o arquivo de exemplo**:
+
+    ```bash
+    cp cypress.env-example.json cypress.env.json
+    ```
+
+2. **Preencha as variáveis** no arquivo `cypress.env.json` com suas credenciais:
+    - `USER_EMAIL`: Email do usuário para testes
+    - `USER_PASSWORD`: Senha do usuário
+    - `PRICING_BFF_STAGING_URL`: URL da API de staging
+    - `MADEIRAMADEIRA_PRODUCTION_URL`: URL de produção
+    - `AUTHORIZATION_TOKEN_STAGING`: Token de autenticação (opcional)
+
+**⚠️ Importante**: O arquivo `cypress.env.json` está no `.gitignore` e não deve ser commitado. Para GitHub Actions, configure as secrets.
+
 ### Como executar
 
 1. **Clonar o repositório e acessar a pasta**:
@@ -265,6 +282,23 @@ Com `cacheAcrossSpecs: true` configurado, a sessão pode ser reutilizada entre s
     `cy:split:*` para reduzir o tempo total de execução.
 -   **Usar cache de sessão**: aproveitar `cy.session` para reduzir tempo de execução em testes que requerem autenticação.
 
+## GitHub Actions / CI/CD
+
+O projeto inclui um workflow básico do GitHub Actions (`.github/workflows/cypress.yml`) que executa os testes automaticamente em push.
+
+### Configuração de Secrets no GitHub
+
+Para que os testes funcionem no GitHub Actions, é necessário configurar as seguintes secrets no repositório:
+
+1. Acesse: **Settings** → **Secrets and variables** → **Actions**
+2. Adicione cada uma das seguintes secrets:
+    - `USER_EMAIL`
+    - `USER_PASSWORD`
+    - `PRICING_BFF_STAGING_URL`
+    - `MADEIRAMADEIRA_PRODUCTION_URL`
+    - `AUTHORIZATION_TOKEN_STAGING`
+
 ## Notas importantes
 
 -   **Testes intencionalmente falhos**: Alguns testes nas specs de exemplo (`login.cy.js` e `quotation.cy.js`) são intencionalmente falhos para demonstrar retries e screenshots no relatório. Eles estão marcados com a tag `@example-fail` e podem ser filtrados em pipelines reais.
+-   **Variáveis de ambiente**: Nunca commite o arquivo `cypress.env.json` com credenciais reais. Use `cypress.env-example.json` como template e configure secrets no GitHub Actions.
