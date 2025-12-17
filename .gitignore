@@ -1,8 +1,5 @@
 node_modules
 cypress.env.json
-cypress/reports/html/screenshots
 cypress/downloads
-cypress/screenshots/
-cypress/screenshots/**
 reports/
 reports/**

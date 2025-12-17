@@ -110,6 +110,29 @@ package.json             # Scripts e dependências do projeto
     -   Utilizam `cy.api()` / `cy.request()` (via `cypress-plugin-api`).
     -   Validam status code, schema e dados de resposta (ex.: cotação de frete).
 
+### Como decidir onde colocar um teste?
+
+Use estas perguntas para ajudar na decisão:
+
+1. **O teste precisa abrir um navegador?**
+
+    - ✅ Sim → `cypress/e2e/`
+    - ❌ Não → `cypress/api/`
+
+2. **O teste interage com elementos visuais?**
+
+    - ✅ Sim → `cypress/e2e/`
+    - ❌ Não → `cypress/api/`
+
+3. **O teste valida apenas a resposta de uma API?**
+
+    - ✅ Sim → `cypress/api/`
+    - ❌ Não → `cypress/e2e/`
+
+4. **O teste simula um fluxo completo do usuário?**
+    - ✅ Sim → `cypress/e2e/`
+    - ❌ Não → Considere `cypress/api/`
+
 ## Fluxo de relatórios e screenshots
 
 ### Configuração no `cypress.config.js`
@@ -191,6 +214,45 @@ Com `@cypress/grep` configurado em `cypress.config.js` e registrado em
 `@quotation`, respectivamente, mas você pode criar novos scripts seguindo
 o mesmo padrão.
 
+## Cache de sessão com `cy.session`
+
+O projeto utiliza `cy.session` para cachear sessões de login entre testes, melhorando significativamente a performance. O comando `cy.gui_login` suporta cache através do parâmetro `cacheSession` (padrão: `true`).
+
+### Como validar que o cache está funcionando
+
+**Observando os logs do Cypress:**
+
+-   **Primeira execução (cria sessão):**
+
+    ```
+    ✓ Saved session: user@example.com
+    ```
+
+-   **Execuções subsequentes (reutiliza sessão):**
+    ```
+    ✓ Restored session: user@example.com
+    ```
+
+**Teste comparativo de tempo:**
+
+Execute testes com e sem cache para comparar a diferença de performance:
+
+```javascript
+cy.gui_login(user, password, { cacheSession: false }) // Sem cache
+cy.gui_login(user, password, { cacheSession: true }) // Com cache
+```
+
+O tempo com cache deve ser significativamente menor quando a sessão é reutilizada.
+
+**Validação entre specs diferentes:**
+
+Com `cacheAcrossSpecs: true` configurado, a sessão pode ser reutilizada entre specs diferentes. Execute múltiplos specs em sequência e observe nos logs se aparece "Restored session" ao invés de "Saved session".
+
+### Troubleshooting
+
+-   **Sempre cria nova sessão**: Verifique se `cacheSession: true` está sendo usado e se a função `validate` não está falhando.
+-   **Sessões se misturam entre usuários**: O `sessionId` é baseado no email do usuário, garantindo isolamento por usuário.
+
 ## Boas práticas sugeridas
 
 -   **Centralizar comandos**: concentre ações repetitivas em `gui_commands.js`
@@ -201,3 +263,8 @@ o mesmo padrão.
     anexar screenshots de falhas ao relatório.
 -   **Paralelizar quando possível**: usar `cypress-split` e os scripts
     `cy:split:*` para reduzir o tempo total de execução.
+-   **Usar cache de sessão**: aproveitar `cy.session` para reduzir tempo de execução em testes que requerem autenticação.
+
+## Notas importantes
+
+-   **Testes intencionalmente falhos**: Alguns testes nas specs de exemplo (`login.cy.js` e `quotation.cy.js`) são intencionalmente falhos para demonstrar retries e screenshots no relatório. Eles estão marcados com a tag `@example-fail` e podem ser filtrados em pipelines reais.
