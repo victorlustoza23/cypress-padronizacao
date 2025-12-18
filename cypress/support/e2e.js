@@ -55,3 +55,13 @@ Cypress.on('test:after:run', (test, runnable) => {
 		addContext({ test }, { title: `Failed screenshot (attempt ${attempt - 1})`, value: shot })
 	}
 })
+
+Cypress.on('uncaught:exception', (err, runnable) => {
+	// Ignora só o “Script error” de cross‑origin
+	if (err.message.includes('Script error')) {
+		return false // Não falha o teste
+	}
+
+	// Para qualquer outro erro, deixa o teste falhar normalmente
+	return true
+})

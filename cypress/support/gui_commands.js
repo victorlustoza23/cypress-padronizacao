@@ -1,32 +1,85 @@
-// Comandos customizados para testes de interface gráfica
+/**
+ * Comandos customizados para testes de interface gráfica
+ *
+ * Este arquivo contém comandos personalizados do Cypress para automação de testes GUI,
+ * incluindo gerenciamento de sessões de login com cache.
+ */
+
+// Variável para armazenar o sessionId único por usuário
+// Permite reutilização da mesma sessão entre múltiplas chamadas e entre specs diferentes
+let sessionId = null
+
+/**
+ * Comando customizado para realizar login na aplicação MadeiraMadeira
+ *
+ * @param {string} user - Email do usuário (padrão: USER_EMAIL do env)
+ * @param {string} password - Senha do usuário (padrão: USER_PASSWORD do env)
+ * @param {Object} options - Opções de configuração
+ * @param {boolean} options.cacheSession - Se true, usa cy.session para cachear a sessão (padrão: true)
+ *
+ * Comportamento:
+ * - Se cacheSession = true: usa cy.session para criar/restaurar sessão, permitindo reutilização
+ * - Se cacheSession = false: executa login completo a cada chamada (útil para testes isolados)
+ */
 Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = Cypress.env('USER_PASSWORD'), { cacheSession = true } = {}) => {
+	/**
+	 * Função que executa o fluxo completo de login
+	 * Chamada diretamente quando cacheSession = false, ou dentro de cy.session quando cacheSession = true
+	 */
 	const login = () => {
+		// Navega para a página de verificação/login
 		cy.visit(`${Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL')}/verificar`)
 
+		// Fecha o banner de cookies se estiver visível
+		cy.contains('Concordar e fechar').should('be.visible').click()
+
+		// Preenche email e continua
 		cy.get('[type="text"]').type(user, { log: false })
 		cy.contains('Continuar').click()
+
+		// Preenche senha e continua
 		cy.get('[type="password"]').type(password, { log: false })
 		cy.contains('Continuar').click()
+
+		// Aguarda o login completar: fecha modal e verifica que "Minha Conta" está visível
+		// Isso garante que o fluxo de autenticação terminou antes do snapshot da sessão
+		cy.get('[data-icon="xmark"]').click()
+		cy.contains('Minha Conta', { timeout: 15000 }).should('be.visible')
 	}
 
+	/**
+	 * Função de validação executada pelo cy.session para verificar se a sessão ainda é válida
+	 * Chamada automaticamente quando uma sessão é restaurada (não criada)
+	 *
+	 * Se a validação falhar, o Cypress recria a sessão chamando login() novamente
+	 */
 	const validate = () => {
-		cy.visit(`${Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL')}/verificar`)
-		cy.location('pathname', { timeout: 1000 }).should('not.eq', Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL'))
+		// Visita a home e verifica se o usuário ainda está logado
+		// Se "Minha Conta" estiver visível, significa que a sessão é válida
+		cy.visit(Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL'))
+		cy.contains('Minha Conta', { timeout: 10000 }).should('be.visible')
 	}
 
+	// Opções para o cy.session
 	const options = {
-		cacheAcrossSpecs: true,
-		validate,
+		cacheAcrossSpecs: true, // Permite reutilizar a sessão entre specs diferentes
+		validate, // Função de validação para verificar se a sessão ainda é válida
 	}
 
 	if (cacheSession) {
+		// Modo com cache de sessão: usa cy.session para criar/restaurar sessão
+		// Gera um sessionId estável por usuário (sem timestamp)
+		// Isso permite que o mesmo usuário reaproveite a mesma sessão entre testes
 		if (!sessionId) {
-			sessionId = `${user}-${new Date().getTime()}`
-			cy.session(sessionId, login, options)
-		} else {
-			cy.session(sessionId, login, options)
+			// Sufixo de versão (v1) evita conflito com sessões antigas que usavam
+			// funções de validate diferentes (Cypress não permite reutilizar sessionId
+			// se a função validate mudou)
+			sessionId = `gui_session_v1_${user}`
 		}
+		cy.session(sessionId, login, options)
 	} else {
+		// Modo sem cache: executa login completo a cada chamada
+		// Útil para testes que precisam de isolamento completo
 		login()
 	}
 })

@@ -44,9 +44,9 @@ export default defineConfig({
 		// Flag experimental: permite executar todas as specs em uma única sessão do navegador
 		// Útil para testes que compartilham estado entre specs (ex: sessões cacheadas)
 		experimentalRunAllSpecs: true,
-		// Timeout padrão para comandos (15 segundos)
+		// Timeout padrão para comandos (30 segundos)
 		// Aumentado para lidar com aplicações que podem ter latência maior
-		defaultCommandTimeout: 15000,
+		defaultCommandTimeout: 30000,
 		setupNodeEvents(on, config) {
 			// Registra plugin do mochawesome para processar eventos durante a execução
 			require('cypress-mochawesome-reporter/plugin')(on)
