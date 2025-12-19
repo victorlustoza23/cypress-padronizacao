@@ -28,6 +28,7 @@ export default defineConfig({
 			grepOmitFiltered: true, // Omite specs filtradas do relatório (não conta como skipped)
 			hideCredentials: true, // Oculta credenciais nos logs (segurança)
 			snapshotOnly: true, // Aplica snapshots apenas em modo snapshot (otimização)
+			
 		},
 		// Retries automáticos para lidar com testes instáveis/flaky
 		// runMode: usado em 'cypress run' (CI/local headless)
@@ -48,6 +49,15 @@ export default defineConfig({
 		// Aumentado para lidar com aplicações que podem ter latência maior
 		defaultCommandTimeout: 30000,
 		setupNodeEvents(on, config) {
+			on('before:browser:launch', (browser = {}, launchOptions) => {
+        		if (browser.family === 'chromium') {
+          			launchOptions.args.push('--disable-gpu')
+          			// opcional: melhorar estabilidade em CI
+          			launchOptions.args.push('--disable-dev-shm-usage')
+          			launchOptions.args.push('--no-sandbox')
+        		}
+        		return launchOptions
+      		})
 			// Registra plugin do mochawesome para processar eventos durante a execução
 			require('cypress-mochawesome-reporter/plugin')(on)
 
