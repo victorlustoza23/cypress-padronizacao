@@ -12,6 +12,10 @@ describe('Login example spec', () => {
 	const password = Cypress.env('USER_PASSWORD')
 	// cacheSession: false garante login "fresco" a cada teste (útil para testes isolados)
 	const options = { cacheSession: false }
+	
+	beforeEach(() => {
+		cy.gui_setupUserAgent()
+	})
 
 	it('Validate login on MadeiraMadeira', { tags: '@login' }, () => {
 		// Act: executa login e navegação
