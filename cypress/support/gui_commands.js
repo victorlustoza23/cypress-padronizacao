@@ -86,8 +86,8 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 
 Cypress.Commands.add('gui_setupUserAgent', () => {
 	const usersAutomation = Cypress.env('usersAutomation')
-	const castleBrowserToken = Cypress.env('castleBrowserToken')
-	const customUserAgent = Cypress.env('customUserAgent')
+	const castleBrowserToken = Cypress.env('CASTLE_BROWSER_TOKEN')
+	const customUserAgent = Cypress.env('CUSTOM_USER_AGENT')
 
 	cy.intercept('**/*', (req) => {
 		req.headers['User-Agent'] = customUserAgent
