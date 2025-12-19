@@ -28,7 +28,7 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 	 */
 	const login = () => {
 		// Navega para a página de verificação/login
-		cy.visit(`${Cypress.env('MADEIRAMADEIRA_STAGING_URL')}/verificar`, { timeout: 7000, failOnStatusCode: false })
+		cy.visit(`${Cypress.env('MADEIRAMADEIRA_STAGING_URL')}/verificar`, { timeout: 7000 })
 
 		// Fecha o banner de cookies se estiver visível
 		cy.contains('Concordar e fechar').should('be.visible').click()
