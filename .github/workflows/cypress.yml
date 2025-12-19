@@ -53,6 +53,7 @@ jobs:
                     "USER_PASSWORD": "${{ secrets.USER_PASSWORD }}",
                     "PRICING_BFF_STAGING_URL": "${{ secrets.PRICING_BFF_STAGING_URL }}",
                     "MADEIRAMADEIRA_STAGING_URL": "${{ secrets.MADEIRAMADEIRA_STAGING_URL }}",
+                    "MADEIRAMADEIRA_PRODUCTION_URL": "${{ secrets.MADEIRAMADEIRA_PRODUCTION_URL }}",
                     "AUTHORIZATION_TOKEN_STAGING": "${{ secrets.AUTHORIZATION_TOKEN_STAGING }}"
                   }' > cypress.env.json
 
