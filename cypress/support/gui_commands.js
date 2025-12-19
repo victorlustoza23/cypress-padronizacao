@@ -83,3 +83,61 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 		login()
 	}
 })
+
+Cypress.Commands.add('gui_setupUserAgent', () => {
+	const usersAutomation = Cypress.env('usersAutomation')
+	const castleBrowserToken = Cypress.env('castleBrowserToken')
+	const customUserAgent = Cypress.env('customUserAgent')
+
+	cy.intercept('**/*', (req) => {
+		req.headers['User-Agent'] = customUserAgent
+	})
+
+	// Interceptar e modificar requisição de verificação de email
+	cy.intercept('POST', '**/api/auth/verify-customer-email', (req) => {
+		req.headers['User-Agent'] = customUserAgent
+		console.log('Interceptando verify-customer-email')
+
+		// Modificar o body se existir
+		if (req.body) {
+			try {
+				let bodyData
+				if (typeof req.body === 'string') {
+					bodyData = JSON.parse(req.body)
+				} else {
+					bodyData = req.body
+				}
+
+				// Adicionar o token Castle
+				bodyData.requestToken = castleBrowserToken
+				req.body = JSON.stringify(bodyData)
+			} catch (e) {
+				console.log('Erro ao modificar body do verify-customer-email:', e)
+			}
+		}
+	}).as('verifyEmail')
+
+	// Interceptar e modificar requisição de autenticação
+	cy.intercept('POST', '**/api/auth/callback/customerAuth', (req) => {
+		req.headers['User-Agent'] = customUserAgent
+		console.log('Interceptando customerAuth')
+
+		// Modificar o body se existir
+		if (req.body) {
+			try {
+				let bodyData
+				if (typeof req.body === 'string') {
+					bodyData = JSON.parse(req.body)
+				} else {
+					bodyData = req.body
+				}
+
+				// Adicionar o token Castle
+				bodyData.token = castleBrowserToken
+				req.body = JSON.stringify(bodyData)
+			} catch (e) {
+				console.log('Erro ao modificar body do customerAuth:', e)
+			}
+		}
+	}).as('customerAuth')
+})
