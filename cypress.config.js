@@ -59,6 +59,15 @@ export default defineConfig({
 			// Plugin para filtragem de testes por tags (@cypress/grep)
 			// Permite executar apenas testes com tags específicas: --env grepTags='@login'
 			cypressGrepPlugin(config)
+
+			on('before:browser:launch', (browser = {}, launchOptions) => {
+				if (browser.family === 'electron') {
+					launchOptions.args.push('--disable-gpu')
+					launchOptions.args.push('--disable-dev-shm-usage')
+					launchOptions.args.push('--no-sandbox')
+				}
+				return launchOptions
+			})
 			return config
 		},
 	},
