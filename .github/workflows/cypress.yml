@@ -54,7 +54,9 @@ jobs:
                     "PRICING_BFF_STAGING_URL": "${{ secrets.PRICING_BFF_STAGING_URL }}",
                     "MADEIRAMADEIRA_STAGING_URL": "${{ secrets.MADEIRAMADEIRA_STAGING_URL }}",
                     "MADEIRAMADEIRA_PRODUCTION_URL": "${{ secrets.MADEIRAMADEIRA_PRODUCTION_URL }}",
-                    "AUTHORIZATION_TOKEN_STAGING": "${{ secrets.AUTHORIZATION_TOKEN_STAGING }}"
+                    "AUTHORIZATION_TOKEN_STAGING": "${{ secrets.AUTHORIZATION_TOKEN_STAGING }}",
+                    "CASTLE_BROWSER_TOKEN": "${{ secrets.CASTLE_BROWSER_TOKEN }}",
+                    "CUSTOM_USER_AGENT": "${{ secrets.CUSTOM_USER_AGENT }}"
                   }' > cypress.env.json
 
             - name: Run Cypress split
