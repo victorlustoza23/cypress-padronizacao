@@ -28,7 +28,7 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 	 */
 	const login = () => {
 		// Navega para a página de verificação/login
-		cy.visit(`${Cypress.env('MADEIRAMADEIRA_STAGING_URL')}/verificar`, { timeout: 7000 })
+		cy.visit(`${Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL')}/verificar`, { timeout: 7000 })
 
 		// Fecha o banner de cookies se estiver visível
 		cy.contains('Concordar e fechar').should('be.visible').click()
@@ -56,7 +56,7 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 	const validate = () => {
 		// Visita a home e verifica se o usuário ainda está logado
 		// Se "Minha Conta" estiver visível, significa que a sessão é válida
-		cy.visit(Cypress.env('MADEIRAMADEIRA_STAGING_URL'))
+		cy.visit(Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL'))
 		cy.contains('Minha Conta').should('be.visible')
 	}
 
