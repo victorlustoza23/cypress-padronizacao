@@ -88,6 +88,122 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 	const castleBrowserToken = Cypress.env('CASTLE_BROWSER_TOKEN')
 	const customUserAgent = Cypress.env('CUSTOM_USER_AGENT')
 
+	/**
+	 * Função auxiliar para parsear o body da requisição
+	 * Suporta tanto JSON quanto application/x-www-form-urlencoded
+	 */
+	const parseRequestBody = (body, contentType) => {
+		if (!body) return null
+
+		// Se já é um objeto, retorna direto
+		if (typeof body === 'object' && !Array.isArray(body)) {
+			return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
+		}
+
+		// Se é string, tenta detectar o formato
+		if (typeof body === 'string') {
+			// Verifica Content-Type explícito primeiro (prioridade)
+			const hasFormUrlEncodedContentType = contentType?.includes('application/x-www-form-urlencoded')
+			const hasTextPlainContentType = contentType?.includes('text/plain')
+			const hasJsonContentType = contentType?.includes('application/json')
+
+			// PRIORIDADE 1: Se Content-Type é text/plain, verificar o conteúdo real do body
+			// (text/plain pode conter tanto JSON quanto form-urlencoded)
+			if (hasTextPlainContentType) {
+				// Verifica se o body parece JSON (começa com { ou [)
+				const looksLikeJson = body.trim().startsWith('{') || body.trim().startsWith('[')
+
+				if (looksLikeJson) {
+					// Tenta parsear como JSON
+					try {
+						const parsed = JSON.parse(body)
+						// Preserva o Content-Type original text/plain mesmo sendo JSON
+						return { data: parsed, isFormUrlEncoded: false, originalContentType: contentType }
+					} catch (e) {
+						// Se falhar parsear JSON, tenta form-urlencoded
+						const params = new URLSearchParams(body)
+						const data = {}
+						for (const [key, value] of params.entries()) {
+							data[key] = value
+						}
+						return { data, isFormUrlEncoded: true, originalContentType: contentType }
+					}
+				} else {
+					// Não parece JSON, trata como form-urlencoded
+					const params = new URLSearchParams(body)
+					const data = {}
+					for (const [key, value] of params.entries()) {
+						data[key] = value
+					}
+					// Preserva o Content-Type original text/plain
+					return { data, isFormUrlEncoded: true, originalContentType: contentType }
+				}
+			}
+
+			// PRIORIDADE 2: Se Content-Type é explícito form-urlencoded
+			if (hasFormUrlEncodedContentType) {
+				const params = new URLSearchParams(body)
+				const data = {}
+				for (const [key, value] of params.entries()) {
+					data[key] = value
+				}
+				return { data, isFormUrlEncoded: true, originalContentType: 'application/x-www-form-urlencoded' }
+			}
+
+			// PRIORIDADE 3: Se Content-Type é JSON, parsear como JSON
+			if (hasJsonContentType) {
+				try {
+					const parsed = JSON.parse(body)
+					return { data: parsed, isFormUrlEncoded: false, originalContentType: 'application/json' }
+				} catch (e) {
+					// Se falhar, retorna como está
+					return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
+				}
+			}
+
+			// PRIORIDADE 4: Tentar detectar pelo formato do conteúdo
+			// Detecta se é form-urlencoded pelo formato do conteúdo
+			const looksLikeFormUrlEncoded = body.includes('=') && !body.trim().startsWith('{') && !body.trim().startsWith('[') && /^[^=]+=[^=]*(&[^=]+=[^=]*)*$/.test(body.trim())
+
+			if (looksLikeFormUrlEncoded) {
+				const params = new URLSearchParams(body)
+				const data = {}
+				for (const [key, value] of params.entries()) {
+					data[key] = value
+				}
+				return { data, isFormUrlEncoded: true, originalContentType: 'application/x-www-form-urlencoded' }
+			}
+
+			// PRIORIDADE 5: Tentar parsear como JSON (último recurso)
+			try {
+				const parsed = JSON.parse(body)
+				return { data: parsed, isFormUrlEncoded: false, originalContentType: 'application/json' }
+			} catch (e) {
+				// Se não conseguir identificar, retorna como está
+				return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
+			}
+		}
+
+		return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
+	}
+
+	/**
+	 * Função auxiliar para serializar o body de volta ao formato original
+	 */
+	const serializeRequestBody = (bodyData, isFormUrlEncoded) => {
+		if (isFormUrlEncoded) {
+			// Converte objeto para form-urlencoded
+			const params = new URLSearchParams()
+			for (const [key, value] of Object.entries(bodyData)) {
+				params.append(key, value)
+			}
+			return params.toString()
+		} else {
+			// Converte objeto para JSON
+			return JSON.stringify(bodyData)
+		}
+	}
+
 	cy.intercept('**/*', (req) => {
 		req.headers['User-Agent'] = customUserAgent
 	})
@@ -95,23 +211,24 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 	// Interceptar e modificar requisição de verificação de email
 	cy.intercept('POST', '**/api/auth/verify-customer-email', (req) => {
 		req.headers['User-Agent'] = customUserAgent
-		console.log('Interceptando verify-customer-email')
 
 		// Modificar o body se existir
 		if (req.body) {
 			try {
-				let bodyData
-				if (typeof req.body === 'string') {
-					bodyData = JSON.parse(req.body)
-				} else {
-					bodyData = req.body
-				}
+				const contentType = req.headers['content-type'] || req.headers['Content-Type']
+				const parsed = parseRequestBody(req.body, contentType)
 
-				// Adicionar o token Castle
-				bodyData.requestToken = castleBrowserToken
-				req.body = JSON.stringify(bodyData)
+				if (parsed && parsed.data) {
+					// Adicionar o token Castle
+					parsed.data.requestToken = castleBrowserToken
+					req.body = serializeRequestBody(parsed.data, parsed.isFormUrlEncoded)
+
+					// Preserva o Content-Type original ou usa o detectado
+					req.headers['content-type'] = parsed.originalContentType || (parsed.isFormUrlEncoded ? 'application/x-www-form-urlencoded' : 'application/json')
+				}
 			} catch (e) {
-				console.log('Erro ao modificar body do verify-customer-email:', e)
+				console.error('[verify-customer-email] Erro ao modificar body:', e.message)
+				console.error('[verify-customer-email] Stack:', e.stack)
 			}
 		}
 	}).as('verifyEmail')
@@ -119,23 +236,24 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 	// Interceptar e modificar requisição de autenticação
 	cy.intercept('POST', '**/api/auth/callback/customerAuth', (req) => {
 		req.headers['User-Agent'] = customUserAgent
-		console.log('Interceptando customerAuth')
 
 		// Modificar o body se existir
 		if (req.body) {
 			try {
-				let bodyData
-				if (typeof req.body === 'string') {
-					bodyData = JSON.parse(req.body)
-				} else {
-					bodyData = req.body
-				}
+				const contentType = req.headers['content-type'] || req.headers['Content-Type']
+				const parsed = parseRequestBody(req.body, contentType)
 
-				// Adicionar o token Castle
-				bodyData.token = castleBrowserToken
-				req.body = JSON.stringify(bodyData)
+				if (parsed && parsed.data) {
+					// Adicionar o token Castle
+					parsed.data.token = castleBrowserToken
+					req.body = serializeRequestBody(parsed.data, parsed.isFormUrlEncoded)
+
+					// Preserva o Content-Type original ou usa o detectado
+					req.headers['content-type'] = parsed.originalContentType || (parsed.isFormUrlEncoded ? 'application/x-www-form-urlencoded' : 'application/json')
+				}
 			} catch (e) {
-				console.log('Erro ao modificar body do customerAuth:', e)
+				console.error('[customerAuth] Erro ao modificar body:', e.message)
+				console.error('[customerAuth] Stack:', e.stack)
 			}
 		}
 	}).as('customerAuth')
