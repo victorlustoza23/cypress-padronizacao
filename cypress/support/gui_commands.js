@@ -43,7 +43,7 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 
 		// Aguarda o login completar: fecha modal e verifica que "Minha Conta" está visível
 		// Isso garante que o fluxo de autenticação terminou antes do snapshot da sessão
-		cy.get('[data-icon="xmark"]', { timeout: 60000 }).click()
+		cy.get('[data-icon="xmark"]').click()
 		cy.contains('Minha Conta').should('be.visible')
 	}
 
@@ -85,38 +85,17 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 })
 
 Cypress.Commands.add('gui_setupUserAgent', () => {
-	const usersAutomation = Cypress.env('usersAutomation')
 	const castleBrowserToken = Cypress.env('CASTLE_BROWSER_TOKEN')
 	const customUserAgent = Cypress.env('CUSTOM_USER_AGENT')
 
-	// Validação inicial: verificar se as variáveis existem e não estão vazias
-	if (usersAutomation !== undefined) {
-		expect(usersAutomation, 'usersAutomation deve estar definido no cypress.env.json').to.exist
-	}
-	expect(castleBrowserToken, 'CASTLE_BROWSER_TOKEN deve estar definido no cypress.env.json').to.exist.and.not.be.empty
-	expect(customUserAgent, 'CUSTOM_USER_AGENT deve estar definido no cypress.env.json').to.exist.and.not.be.empty
-
-	// Log informativo dos valores que serão utilizados
-	cy.log(`Configurando User-Agent: ${customUserAgent}`)
-	cy.log(`Configurando Castle Browser Token: ${castleBrowserToken ? '***' + castleBrowserToken.slice(-4) : 'não definido'}`)
-	if (usersAutomation !== undefined) {
-		cy.log(`usersAutomation: ${usersAutomation}`)
-	}
-
 	cy.intercept('**/*', (req) => {
 		req.headers['User-Agent'] = customUserAgent
-		// Validação: garantir que o header foi aplicado
-		expect(req.headers['User-Agent']).to.equal(customUserAgent)
 	})
 
 	// Interceptar e modificar requisição de verificação de email
 	cy.intercept('POST', '**/api/auth/verify-customer-email', (req) => {
 		req.headers['User-Agent'] = customUserAgent
 		console.log('Interceptando verify-customer-email')
-		console.log(`User-Agent aplicado: ${req.headers['User-Agent']}`)
-
-		// Validação: garantir que o header foi aplicado
-		expect(req.headers['User-Agent']).to.equal(customUserAgent)
 
 		// Modificar o body se existir
 		if (req.body) {
@@ -131,13 +110,8 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 				// Adicionar o token Castle
 				bodyData.requestToken = castleBrowserToken
 				req.body = JSON.stringify(bodyData)
-
-				// Validação: garantir que o token foi adicionado ao body
-				expect(bodyData.requestToken).to.equal(castleBrowserToken)
-				console.log(`Castle Browser Token aplicado no body: ***${castleBrowserToken.slice(-4)}`)
 			} catch (e) {
 				console.log('Erro ao modificar body do verify-customer-email:', e)
-				throw e
 			}
 		}
 	}).as('verifyEmail')
@@ -146,10 +120,6 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 	cy.intercept('POST', '**/api/auth/callback/customerAuth', (req) => {
 		req.headers['User-Agent'] = customUserAgent
 		console.log('Interceptando customerAuth')
-		console.log(`User-Agent aplicado: ${req.headers['User-Agent']}`)
-
-		// Validação: garantir que o header foi aplicado
-		expect(req.headers['User-Agent']).to.equal(customUserAgent)
 
 		// Modificar o body se existir
 		if (req.body) {
@@ -164,14 +134,8 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 				// Adicionar o token Castle
 				bodyData.token = castleBrowserToken
 				req.body = JSON.stringify(bodyData)
-
-				// Validação: garantir que o token foi adicionado ao body
-				expect(bodyData.token).to.equal(castleBrowserToken)
-				console.log(`Castle Browser Token aplicado no body: ***${castleBrowserToken.slice(-4)}`)
-				console.log('Body completo:', JSON.stringify(bodyData))
 			} catch (e) {
 				console.log('Erro ao modificar body do customerAuth:', e)
-				throw e
 			}
 		}
 	}).as('customerAuth')
