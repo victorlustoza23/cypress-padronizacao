@@ -43,7 +43,7 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 
 		// Aguarda o login completar: fecha modal e verifica que "Minha Conta" está visível
 		// Isso garante que o fluxo de autenticação terminou antes do snapshot da sessão
-		cy.get('[data-icon="xmark"]').click()
+		cy.get('[data-icon="xmark"]', { timeout: 60000 }).click()
 		cy.contains('Minha Conta').should('be.visible')
 	}
 
