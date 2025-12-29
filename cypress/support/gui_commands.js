@@ -56,7 +56,7 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 	const validate = () => {
 		// Visita a home e verifica se o usuário ainda está logado
 		// Se "Minha Conta" estiver visível, significa que a sessão é válida
-		cy.visit(Cypress.env('MADEIRAMADEIRA_STAGING_URL'))
+		cy.visit(Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL'))
 		cy.contains('Minha Conta').should('be.visible')
 	}
 
