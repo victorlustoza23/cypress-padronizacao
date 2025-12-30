@@ -100,90 +100,36 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 			return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
 		}
 
-		// Se é string, tenta detectar o formato
+		// Se é string, tenta detectar e parsear
 		if (typeof body === 'string') {
-			// Verifica Content-Type explícito primeiro (prioridade)
-			const hasFormUrlEncodedContentType = contentType?.includes('application/x-www-form-urlencoded')
-			const hasTextPlainContentType = contentType?.includes('text/plain')
-			const hasJsonContentType = contentType?.includes('application/json')
+			// Fluxo feliz: tenta JSON se parecer JSON
+			const looksLikeJson = body.trim().startsWith('{') || body.trim().startsWith('[')
 
-			// PRIORIDADE 1: Se Content-Type é text/plain, verificar o conteúdo real do body
-			// (text/plain pode conter tanto JSON quanto form-urlencoded)
-			if (hasTextPlainContentType) {
-				// Verifica se o body parece JSON (começa com { ou [)
-				const looksLikeJson = body.trim().startsWith('{') || body.trim().startsWith('[')
-
-				if (looksLikeJson) {
-					// Tenta parsear como JSON
-					try {
-						const parsed = JSON.parse(body)
-						// Preserva o Content-Type original text/plain mesmo sendo JSON
-						return { data: parsed, isFormUrlEncoded: false, originalContentType: contentType }
-					} catch (e) {
-						// Se falhar parsear JSON, tenta form-urlencoded
-						const params = new URLSearchParams(body)
-						const data = {}
-						for (const [key, value] of params.entries()) {
-							data[key] = value
-						}
-						return { data, isFormUrlEncoded: true, originalContentType: contentType }
-					}
-				} else {
-					// Não parece JSON, trata como form-urlencoded
-					const params = new URLSearchParams(body)
-					const data = {}
-					for (const [key, value] of params.entries()) {
-						data[key] = value
-					}
-					// Preserva o Content-Type original text/plain
-					return { data, isFormUrlEncoded: true, originalContentType: contentType }
-				}
-			}
-
-			// PRIORIDADE 2: Se Content-Type é explícito form-urlencoded
-			if (hasFormUrlEncodedContentType) {
-				const params = new URLSearchParams(body)
-				const data = {}
-				for (const [key, value] of params.entries()) {
-					data[key] = value
-				}
-				return { data, isFormUrlEncoded: true, originalContentType: 'application/x-www-form-urlencoded' }
-			}
-
-			// PRIORIDADE 3: Se Content-Type é JSON, parsear como JSON
-			if (hasJsonContentType) {
+			if (looksLikeJson) {
 				try {
 					const parsed = JSON.parse(body)
-					return { data: parsed, isFormUrlEncoded: false, originalContentType: 'application/json' }
+					return { data: parsed, isFormUrlEncoded: false, originalContentType: contentType || 'application/json' }
 				} catch (e) {
-					// Se falhar, retorna como está
-					return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
+					// Fallback: tenta form-urlencoded se JSON falhar
 				}
 			}
 
-			// PRIORIDADE 4: Tentar detectar pelo formato do conteúdo
-			// Detecta se é form-urlencoded pelo formato do conteúdo
-			const looksLikeFormUrlEncoded = body.includes('=') && !body.trim().startsWith('{') && !body.trim().startsWith('[') && /^[^=]+=[^=]*(&[^=]+=[^=]*)*$/.test(body.trim())
-
-			if (looksLikeFormUrlEncoded) {
+			// Fluxo feliz: tenta form-urlencoded
+			try {
 				const params = new URLSearchParams(body)
 				const data = {}
 				for (const [key, value] of params.entries()) {
 					data[key] = value
 				}
-				return { data, isFormUrlEncoded: true, originalContentType: 'application/x-www-form-urlencoded' }
-			}
-
-			// PRIORIDADE 5: Tentar parsear como JSON (último recurso)
-			try {
-				const parsed = JSON.parse(body)
-				return { data: parsed, isFormUrlEncoded: false, originalContentType: 'application/json' }
+				return { data, isFormUrlEncoded: true, originalContentType: contentType || 'application/x-www-form-urlencoded' }
 			} catch (e) {
-				// Se não conseguir identificar, retorna como está
+				// Fallback: retorna como está se ambos falharem
+				console.log('[parseRequestBody] Erro ao parsear body:', e.message, '| Body:', body.substring(0, 100))
 				return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
 			}
 		}
 
+		// Fallback final
 		return { data: body, isFormUrlEncoded: false, originalContentType: contentType }
 	}
 
