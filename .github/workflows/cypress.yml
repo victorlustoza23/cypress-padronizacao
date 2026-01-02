@@ -65,7 +65,7 @@ jobs:
               run: |
                   echo "Limpando reports/html antes da execução..."
                   rm -rf reports/html || true
-                  npx cypress run
+                  npx cypress run 2>/dev/null
 
             - name: Auditoria pós-Cypress
               if: ${{ always() }}

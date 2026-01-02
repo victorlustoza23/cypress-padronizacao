@@ -1,42 +1,81 @@
-## Cypress Padronização
+## 🧪 Cypress Padronização
 
-Suite de testes end-to-end e de API construída com Cypress para demonstrar boas
-práticas de padronização, organização e geração de relatórios automáticos.
-O projeto utiliza tags, divisão de testes em paralelo e mochawesome para
-gerar relatórios HTML unificados, com screenshots de falha anexados
-automaticamente.
+Projeto padrão de automação de testes com Cypress para uso nos repositórios dos times. Este template demonstra boas práticas de padronização, organização e geração de relatórios automáticos.
 
-### Principais recursos
+O projeto utiliza tags, divisão de testes em paralelo e mochawesome para gerar relatórios HTML unificados, com screenshots de falha anexados automaticamente.
 
--   **Cypress 15 configurado**: viewport padronizado, `retries` para rodar
+### 🚀 Como usar este projeto como template padrão
+
+Este repositório serve como **guia de referência** para padronização de projetos de automação. Siga estes passos para criar um novo projeto baseado neste template:
+
+1. **📥 Clone ou use como template**:
+
+    - Use este repositório como base para novos projetos de automação
+    - Copie a estrutura de pastas e arquivos de configuração
+    - Mantenha a organização: `cypress/e2e/`, `cypress/api/`, `cypress/support/`
+
+2. **🔧 Configure as variáveis de ambiente**:
+
+    - Copie `cypress.env-example.json` para `cypress.env.json`
+    - Preencha com as credenciais e URLs específicas do seu projeto
+    - Configure secrets no GitHub Actions para CI/CD
+
+3. **⚙️ Adapte os comandos customizados**:
+
+    - Mantenha a estrutura de `api_commands.js` e `gui_commands.js`
+    - Adapte os comandos para as necessidades específicas do seu projeto
+    - Adicione novos comandos reutilizáveis conforme necessário
+
+4. **📊 Mantenha a estrutura de relatórios**:
+
+    - A configuração de relatórios mochawesome já está pronta
+    - Os screenshots são anexados automaticamente em caso de falha
+    - Use `npm run post-test` após execuções paralelas para gerar relatórios consolidados
+
+5. **🐳 Configure o CI/CD**:
+    - Use os scripts `cy:split:*` para paralelização em pipelines
+    - Configure secrets no GitHub Actions conforme documentado abaixo
+    - Ajuste o workflow conforme necessário para seu ambiente
+
+**✅ Princípios de padronização a seguir**:
+
+-   ✅ Manter comandos customizados centralizados em `support/`
+-   ✅ Usar tags consistentes para organização (`@login`, `@regressao`, etc.)
+-   ✅ Seguir a estrutura de pastas: `e2e/` para UI, `api/` para endpoints
+-   ✅ Gerar relatórios consolidados após execuções paralelas
+-   ✅ Usar cache de sessão para melhorar performance
+
+### ✨ Principais recursos
+
+-   **🧪 Cypress 15 configurado**: viewport padronizado, `retries` para rodar
     novamente testes instáveis e `defaultCommandTimeout` ajustado.
--   **Suporte a `@cypress/grep`**: permite filtrar a execução por tags, tanto
+-   **🔍 Suporte a `@cypress/grep`**: permite filtrar a execução por tags, tanto
     em nível de spec quanto em nível de cenário.
--   **Divisão de execuções com `cypress-split`**: facilita a paralelização em
+-   **🔀 Divisão de execuções com `cypress-split`**: facilita a paralelização em
     pipelines ou execuções distribuídas.
--   **Comandos customizados reutilizáveis** em `api_commands` e `gui_commands`
+-   **🔧 Comandos customizados reutilizáveis** em `api_commands` e `gui_commands`
     para manter as specs mais limpas e legíveis.
--   **Relatórios mochawesome em `reports/html`**, com screenshots incorporados
+-   **📈 Relatórios mochawesome em `reports/html`**, com screenshots incorporados
     e estrutura pronta para merge dos arquivos `.json`.
--   **Integração com `test:after:run`** em `cypress/support/e2e.js` para
+-   **🪝 Integração com `test:after:run`** em `cypress/support/e2e.js` para
     anexar, em cada teste que falha, as screenshots salvas pelo Cypress ao
     relatório mochawesome.
 
-### Pré-requisitos
+### 📋 Pré-requisitos
 
 -   Node.js v24.11.1 (recomendado LTS).
 -   npm 11.6.3 (vem com o Node mais recente).
 -   Acesso ao Git e ao repositório remoto.
 
-### Configuração de variáveis de ambiente
+### 🌍 Configuração de variáveis de ambiente
 
-1. **Copie o arquivo de exemplo**:
+1. **📋 Copie o arquivo de exemplo**:
 
     ```bash
     cp cypress.env-example.json cypress.env.json
     ```
 
-2. **Preencha as variáveis** no arquivo `cypress.env.json` com suas credenciais:
+2. **✏️ Preencha as variáveis** no arquivo `cypress.env.json` com suas credenciais:
     - `USER_EMAIL`: Email do usuário para testes
     - `USER_PASSWORD`: Senha do usuário
     - `PRICING_BFF_STAGING_URL`: URL da API de staging
@@ -45,34 +84,34 @@ automaticamente.
 
 **⚠️ Importante**: O arquivo `cypress.env.json` está no `.gitignore` e não deve ser commitado. Para GitHub Actions, configure as secrets.
 
-### Como executar
+### ▶️ Como executar
 
-1. **Clonar o repositório e acessar a pasta**:
+1. **📥 Clonar o repositório e acessar a pasta**:
 
     ```bash
     git clone https://github.com/<seu-usuario>/cypress-padronizacao.git
     cd cypress-padronizacao
     ```
 
-2. **Instalar dependências**:
+2. **📦 Instalar dependências**:
 
     ```bash
     npm install
     ```
 
-3. **Executar os testes no modo interativo**:
+3. **🎮 Executar os testes no modo interativo**:
 
     ```bash
     npm test
     ```
 
-4. **Executar os testes em modo headless (CI/local)**:
+4. **🤖 Executar os testes em modo headless (CI/local)**:
 
     ```bash
     npm run test:headless
     ```
 
-## Scripts disponíveis (`package.json`)
+## 📜 Scripts disponíveis (`package.json`)
 
 -   **`npm test`**: abre o Cypress Runner (`cypress open`).
 -   **`npm run test:headless`**: roda toda a suíte em modo headless (`cypress run`).
@@ -96,7 +135,7 @@ automaticamente.
 -   **`npm run post-test`**: encadeia `merge-reports` e `generate-report` após
     uma execução headless completa.
 
-## Estrutura relevante do projeto
+## 📁 Estrutura relevante do projeto
 
 ```
 cypress/
@@ -115,7 +154,7 @@ cypress.config.js        # Configurações gerais de e2e, reporter e plugins
 package.json             # Scripts e dependências do projeto
 ```
 
-### Organização de testes
+### 🗂️ Organização de testes
 
 -   **`cypress/e2e/`**: testes end-to-end que simulam o uso da aplicação pela
     interface.
@@ -127,43 +166,43 @@ package.json             # Scripts e dependências do projeto
     -   Utilizam `cy.api()` / `cy.request()` (via `cypress-plugin-api`).
     -   Validam status code, schema e dados de resposta (ex.: cotação de frete).
 
-### Como decidir onde colocar um teste?
+### ❓ Como decidir onde colocar um teste?
 
 Use estas perguntas para ajudar na decisão:
 
-1. **O teste precisa abrir um navegador?**
+1. **🌐 O teste precisa abrir um navegador?**
 
     - ✅ Sim → `cypress/e2e/`
     - ❌ Não → `cypress/api/`
 
-2. **O teste interage com elementos visuais?**
+2. **👁️ O teste interage com elementos visuais?**
 
     - ✅ Sim → `cypress/e2e/`
     - ❌ Não → `cypress/api/`
 
-3. **O teste valida apenas a resposta de uma API?**
+3. **🔌 O teste valida apenas a resposta de uma API?**
 
     - ✅ Sim → `cypress/api/`
     - ❌ Não → `cypress/e2e/`
 
-4. **O teste simula um fluxo completo do usuário?**
+4. **👤 O teste simula um fluxo completo do usuário?**
     - ✅ Sim → `cypress/e2e/`
     - ❌ Não → Considere `cypress/api/`
 
-## Fluxo de relatórios e screenshots
+## 📋 Fluxo de relatórios e screenshots
 
-### Configuração no `cypress.config.js`
+### ⚙️ Configuração no `cypress.config.js`
 
 -   **Reporter**: `cypress-mochawesome-reporter`.
 -   **Opções principais**:
     -   `reportDir: "reports/html/"`.
     -   `embeddedScreenshots: true` para incorporar screenshots no HTML.
     -   `json: true` para gerar arquivos `.json` utilizáveis no merge posterior.
--   **Screenshots**: a pasta padrão de screenshots foi configurada como
+-   **🖼️ Screenshots**: a pasta padrão de screenshots foi configurada como
     `screenshotsFolder: "reports/html/"`, de forma que todas as imagens fiquem
     junto dos JSON e do HTML final.
 
-### Hook `test:after:run` em `cypress/support/e2e.js`
+### 🪝 Hook `test:after:run` em `cypress/support/e2e.js`
 
 -   O arquivo `e2e.js` registra um listener:
     -   **Evento**: `Cypress.on('test:after:run', (test, runnable) => { ... })`.
@@ -189,9 +228,9 @@ Com isso, ao abrir o HTML gerado pelo mochawesome (`merged-report.html` ou
 os screenshots correspondentes a cada tentativa, sem depender de ferramentas
 externas para ajustar os caminhos.
 
-### Passos para executar em paralelo e gerar relatório
+### 🔄 Passos para executar em paralelo e gerar relatório
 
-1. **Rodar os testes em paralelo com `cypress-split`**  
+1. **🔀 Rodar os testes em paralelo com `cypress-split`**  
    Use o script que executa todos os splits em paralelo:
 
     ```bash
@@ -203,7 +242,7 @@ externas para ajustar os caminhos.
     Ao final, você terá múltiplos arquivos `.json` de relatório mochawesome
     gerados em `reports/html/.jsons`, além das screenshots em `reports/html`.
 
-2. **Merge dos relatórios e geração do HTML final**  
+2. **🔗 Merge dos relatórios e geração do HTML final**  
    Após a execução paralela, use o script que já faz o merge e gera o relatório
    final em uma única etapa:
 
@@ -222,7 +261,7 @@ Os relatórios consolidados ficam em `reports/html` e podem ser usados em
 pipelines de CI, anexados manualmente em issues ou simplesmente abertos
 localmente no navegador.
 
-## Execução filtrada por tags
+## 🏷️ Execução filtrada por tags
 
 Com `@cypress/grep` configurado em `cypress.config.js` e registrado em
 `cypress/support/e2e.js`, é possível rodar apenas parte da suíte usando
@@ -231,13 +270,13 @@ Com `@cypress/grep` configurado em `cypress.config.js` e registrado em
 `@quotation`, respectivamente, mas você pode criar novos scripts seguindo
 o mesmo padrão.
 
-## Cache de sessão com `cy.session`
+## 💾 Cache de sessão com `cy.session`
 
 O projeto utiliza `cy.session` para cachear sessões de login entre testes, melhorando significativamente a performance. O comando `cy.gui_login` suporta cache através do parâmetro `cacheSession` (padrão: `true`).
 
-### Como validar que o cache está funcionando
+### ✅ Como validar que o cache está funcionando
 
-**Observando os logs do Cypress:**
+**📝 Observando os logs do Cypress:**
 
 -   **Primeira execução (cria sessão):**
 
@@ -250,7 +289,7 @@ O projeto utiliza `cy.session` para cachear sessões de login entre testes, melh
     ✓ Restored session: user@example.com
     ```
 
-**Teste comparativo de tempo:**
+**⏱️ Teste comparativo de tempo:**
 
 Execute testes com e sem cache para comparar a diferença de performance:
 
@@ -261,32 +300,32 @@ cy.gui_login(user, password, { cacheSession: true }) // Com cache
 
 O tempo com cache deve ser significativamente menor quando a sessão é reutilizada.
 
-**Validação entre specs diferentes:**
+**🔄 Validação entre specs diferentes:**
 
 Com `cacheAcrossSpecs: true` configurado, a sessão pode ser reutilizada entre specs diferentes. Execute múltiplos specs em sequência e observe nos logs se aparece "Restored session" ao invés de "Saved session".
 
-### Troubleshooting
+### 🔧 Troubleshooting
 
 -   **Sempre cria nova sessão**: Verifique se `cacheSession: true` está sendo usado e se a função `validate` não está falhando.
 -   **Sessões se misturam entre usuários**: O `sessionId` é baseado no email do usuário, garantindo isolamento por usuário.
 
-## Boas práticas sugeridas
+## ⭐ Boas práticas sugeridas
 
--   **Centralizar comandos**: concentre ações repetitivas em `gui_commands.js`
+-   **🔧 Centralizar comandos**: concentre ações repetitivas em `gui_commands.js`
     e `api_commands.js`, mantendo as specs mais legíveis.
--   **Usar tags de forma consistente**: ex.: `@regressao`, `@critico`,
+-   **🏷️ Usar tags de forma consistente**: ex.: `@regressao`, `@critico`,
     `@sanidade`, `@login`, `@quotation`.
--   **Padronizar evidências**: aproveitar o hook `test:after:run` para sempre
+-   **📸 Padronizar evidências**: aproveitar o hook `test:after:run` para sempre
     anexar screenshots de falhas ao relatório.
--   **Paralelizar quando possível**: usar `cypress-split` e os scripts
+-   **⚡ Paralelizar quando possível**: usar `cypress-split` e os scripts
     `cy:split:*` para reduzir o tempo total de execução.
--   **Usar cache de sessão**: aproveitar `cy.session` para reduzir tempo de execução em testes que requerem autenticação.
+-   **💾 Usar cache de sessão**: aproveitar `cy.session` para reduzir tempo de execução em testes que requerem autenticação.
 
-## GitHub Actions / CI/CD
+## 🐙 GitHub Actions / CI/CD
 
 O projeto inclui um workflow básico do GitHub Actions (`.github/workflows/cypress.yml`) que executa os testes automaticamente em push.
 
-### Configuração de Secrets no GitHub
+### 🔑 Configuração de Secrets no GitHub
 
 Para que os testes funcionem no GitHub Actions, é necessário configurar as seguintes secrets no repositório:
 
@@ -298,7 +337,7 @@ Para que os testes funcionem no GitHub Actions, é necessário configurar as seg
     - `MADEIRAMADEIRA_PRODUCTION_URL`
     - `AUTHORIZATION_TOKEN_STAGING`
 
-## Notas importantes
+## 📌 Notas importantes
 
 -   **Testes intencionalmente falhos**: Alguns testes nas specs de exemplo (`login.cy.js` e `quotation.cy.js`) são intencionalmente falhos para demonstrar retries e screenshots no relatório. Eles estão marcados com a tag `@example-fail` e podem ser filtrados em pipelines reais.
 -   **Variáveis de ambiente**: Nunca commite o arquivo `cypress.env.json` com credenciais reais. Use `cypress.env-example.json` como template e configure secrets no GitHub Actions.
