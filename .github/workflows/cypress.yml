@@ -7,7 +7,7 @@ on:
 
 jobs:
     tests:
-        name: Spec split ${{ matrix.containers }}/3
+        name: Spec split ${{ matrix.containers }}
         runs-on: ubuntu-latest
 
         strategy:
