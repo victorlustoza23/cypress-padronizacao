@@ -16,6 +16,8 @@ jobs:
                 containers: [1, 2, 3]
 
         env:
+            SPLITS: 3
+            SPLIT: 3
             SPLIT_INDEX: ${{ strategy.job-index }}
             CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
         steps:
