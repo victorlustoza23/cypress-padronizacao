@@ -16,7 +16,8 @@
 		"cy:split:all": "concurrently \"npm run cy:split:1\" \"npm run cy:split:2\" \"npm run cy:split:3\"",
 		"merge-reports": "npx mochawesome-merge reports/html/.jsons/*.json -o reports/html/merged-report.json",
 		"generate-report": "npx marge reports/html/merged-report.json -o reports/html",
-		"post-test": "npm run merge-reports && npm run generate-report"
+		"flatten-screenshots": "node scripts/flatten-screenshots.js",
+		"post-test": "npm run flatten-screenshots && npm run merge-reports && npm run generate-report"
 	},
 	"keywords": [],
 	"author": "Victor Lustoza",
