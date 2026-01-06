@@ -30,7 +30,7 @@ Este repositório serve como **guia de referência** para padronização de proj
 
     - A configuração de relatórios mochawesome já está pronta
     - Os screenshots são anexados automaticamente em caso de falha
-    - Use `npm run post-test` após execuções paralelas para gerar relatórios consolidados
+    - Use `npm run post-test` após execuções paralelas para gerar relatórios consolidados (inclui flatten de screenshots)
 
 5. **🐳 Configure o CI/CD**:
     - Use os scripts `cy:split:*` para paralelização em pipelines
@@ -132,7 +132,8 @@ Este repositório serve como **guia de referência** para padronização de proj
     `cypress-mochawesome-reporter` em `reports/html/.jsons`.
 -   **`npm run generate-report`**: gera o HTML final de relatório a partir
     do JSON consolidado.
--   **`npm run post-test`**: encadeia `merge-reports` e `generate-report` após
+-   **`npm run flatten-screenshots`**: move screenshots de subdiretórios `api` e `e2e` para o diretório raiz `reports/html/`, facilitando a organização dos arquivos.
+-   **`npm run post-test`**: encadeia `flatten-screenshots`, `merge-reports` e `generate-report` após
     uma execução headless completa.
 
 ## 📁 Estrutura relevante do projeto
@@ -252,7 +253,8 @@ externas para ajustar os caminhos.
 
     Esse comando:
 
-    - chama internamente `merge-reports` para consolidar todos os `.json`
+    - chama internamente `flatten-screenshots` para organizar screenshots de subdiretórios `api` e `e2e` no diretório raiz `reports/html/`;
+    - chama `merge-reports` para consolidar todos os `.json`
       gerados em um único arquivo `merged-report.json`;
     - chama `generate-report` para produzir o HTML final (por exemplo,
       `merged-report.html`) dentro de `reports/html`.
