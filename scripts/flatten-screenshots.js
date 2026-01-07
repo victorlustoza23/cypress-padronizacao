@@ -3,34 +3,48 @@ const path = require('path')
 
 const reportsDir = path.join('reports', 'html')
 
-if (!fs.existsSync(reportsDir)) {
-	console.log('reports/html não existe, nada a fazer')
-	process.exit(0)
-}
+/**
+ * Move RECURSIVAMENTE qualquer pasta *.cy.js para reports/html/*.cy.js/
+ * Suporta: api/e2e/subpasta/spec.cy.js → spec.cy.js
+ */
+function flattenSpecFolders(dir) {
+	if (!fs.existsSync(dir)) return
 
-const subdirs = ['api', 'e2e']
+	fs.readdirSync(dir, { withFileTypes: true })
+		.filter((item) => item.isDirectory() && item.name.endsWith('.cy.js'))
+		.forEach((item) => {
+			const specFrom = path.join(dir, item.name)
+			const specTo = path.join(reportsDir, item.name)
 
-subdirs.forEach((sub) => {
-	const subDir = path.join(reportsDir, sub)
-	if (!fs.existsSync(subDir)) return
-
-	fs.readdirSync(subDir, { withFileTypes: true })
-		.filter((d) => d.isDirectory() && d.name.endsWith('.cy.js'))
-		.forEach((d) => {
-			const from = path.join(subDir, d.name)
-			const to = path.join(reportsDir, d.name)
-
-			if (!fs.existsSync(to)) {
-				console.log(`Movendo ${from} → ${to}`)
-				fs.renameSync(from, to)
-			} else {
-				console.log(`Destino já existe, mantendo: ${to}`)
+			if (!fs.existsSync(specTo)) {
+				console.log(`📁 Movendo: ${specFrom} → ${specTo}`)
+				fs.renameSync(specFrom, specTo)
 			}
 		})
 
-	if (fs.readdirSync(subDir).length === 0) {
-		fs.rmdirSync(subDir)
-	}
-})
+	// Chama recursivamente em subpastas
+	fs.readdirSync(dir, { withFileTypes: true })
+		.filter((item) => item.isDirectory() && !item.name.endsWith('.cy.js'))
+		.forEach((item) => flattenSpecFolders(path.join(dir, item.name)))
+}
 
-console.log('Flatten de screenshots concluído.')
+// Executa em toda árvore reports/html/
+flattenSpecFolders(reportsDir)
+
+// Limpa pastas vazias
+function cleanEmptyDirs(dir) {
+	fs.readdirSync(dir, { withFileTypes: true })
+		.filter((item) => item.isDirectory())
+		.forEach((item) => {
+			const fullPath = path.join(dir, item.name)
+			cleanEmptyDirs(fullPath)
+
+			if (fs.readdirSync(fullPath).length === 0) {
+				console.log(`🗑️  Removendo pasta vazia: ${fullPath}`)
+				fs.rmdirSync(fullPath)
+			}
+		})
+}
+
+cleanEmptyDirs(reportsDir)
+console.log('✅ Flatten completo! Todas screenshots em reports/html/*.cy.js/')

@@ -32,6 +32,11 @@ Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = 
 	}
 })
 
+Cypress.Commands.add('gui_loginValidation', () => {
+	cy.contains('Minha Conta').should('be.visible').click()
+	cy.contains('span', 'Sair').should('be.visible')
+})
+
 Cypress.Commands.add('gui_setupUserAgent', () => {
 	const castleBrowserToken = Cypress.env('CASTLE_BROWSER_TOKEN')
 	const customUserAgent = Cypress.env('CUSTOM_USER_AGENT')
