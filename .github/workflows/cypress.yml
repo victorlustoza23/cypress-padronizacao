@@ -1,245 +1,245 @@
 name: Cypress Tests
 
 on:
-    push:
-        branches:
-            - 'master'
+  push:
+    branches:
+      - 'master'
 
 jobs:
-    tests:
-        name: Cypress worker ${{ matrix.containers }}
-        runs-on: ubuntu-latest
+  tests:
+    name: Cypress worker ${{ matrix.containers }}
+    runs-on: ubuntu-latest
 
-        strategy:
-            fail-fast: false
-            matrix:
-                containers: [1, 2, 3]
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
 
-        env:
-            SPLITS: 3
-            SPLIT: 3
-            SPLIT_INDEX: ${{ strategy.job-index }}
-            CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+    env:
+      SPLITS: 3
+      SPLIT: 3
+      SPLIT_INDEX: ${{ strategy.job-index }}
+      CYPRESS_CACHE_FOLDER: ~/.cache/Cypress
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Contexto inicial
-              run: |
-                  echo "=== CONTEXTO INICIAL JOB SPLIT ${SPLIT_INDEX} ==="
-                  pwd
-                  echo "Conteúdo do diretório:"
-                  ls -R
+      - name: Contexto inicial
+        run: |
+          echo "=== CONTEXTO INICIAL JOB SPLIT ${SPLIT_INDEX} ==="
+          pwd
+          echo "Conteúdo do diretório:"
+          ls -R
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24.11.1
-                  cache: npm
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.11.1
+          cache: npm
 
-            - name: Ajustar versão do npm
-              run: npm install -g npm@11.6.3
+      - name: Ajustar versão do npm
+        run: npm install -g npm@11.6.3
 
-            - name: Install dependencies
-              run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Create cypress.env.json
-              run: |
-                  echo '{
-                    "USER_EMAIL": "${{ secrets.USER_EMAIL }}",
-                    "USER_PASSWORD": "${{ secrets.USER_PASSWORD }}",
-                    "PRICING_BFF_STAGING_URL": "${{ secrets.PRICING_BFF_STAGING_URL }}",
-                    "MADEIRAMADEIRA_STAGING_URL": "${{ secrets.MADEIRAMADEIRA_STAGING_URL }}",
-                    "MADEIRAMADEIRA_PRODUCTION_URL": "${{ secrets.MADEIRAMADEIRA_PRODUCTION_URL }}",
-                    "AUTHORIZATION_TOKEN_STAGING": "${{ secrets.AUTHORIZATION_TOKEN_STAGING }}",
-                    "CASTLE_BROWSER_TOKEN": "${{ secrets.CASTLE_BROWSER_TOKEN }}",
-                    "CUSTOM_USER_AGENT": "${{ secrets.CUSTOM_USER_AGENT }}"
-                  }' > cypress.env.json
+      - name: Create cypress.env.json
+        run: |
+          echo '{
+            "USER_EMAIL": "${{ secrets.USER_EMAIL }}",
+            "USER_PASSWORD": "${{ secrets.USER_PASSWORD }}",
+            "PRICING_BFF_STAGING_URL": "${{ secrets.PRICING_BFF_STAGING_URL }}",
+            "MADEIRAMADEIRA_STAGING_URL": "${{ secrets.MADEIRAMADEIRA_STAGING_URL }}",
+            "MADEIRAMADEIRA_PRODUCTION_URL": "${{ secrets.MADEIRAMADEIRA_PRODUCTION_URL }}",
+            "AUTHORIZATION_TOKEN_STAGING": "${{ secrets.AUTHORIZATION_TOKEN_STAGING }}",
+            "CASTLE_BROWSER_TOKEN": "${{ secrets.CASTLE_BROWSER_TOKEN }}",
+            "CUSTOM_USER_AGENT": "${{ secrets.CUSTOM_USER_AGENT }}"
+          }' > cypress.env.json
 
-            - name: Run Cypress split
-              id: cypress_run
-              continue-on-error: true
-              run: |
-                  echo "Limpando reports/html antes da execução..."
-                  rm -rf reports/html || true
-                  npx cypress run 2>/dev/null
+      - name: Run Cypress split
+        id: cypress_run
+        continue-on-error: true
+        run: |
+          echo "Limpando reports/html antes da execução..."
+          rm -rf reports/html || true
+          npx cypress run 2>/dev/null
 
-            - name: Auditoria pós-Cypress
-              if: ${{ always() }}
-              run: |
-                  echo "=== LISTANDO reports/html ==="
-                  if [ -d reports/html ]; then
-                    ls -R reports/html || true
-                    echo "Arquivos JSON encontrados:"
-                    find reports/html -name "*.json" -maxdepth 3 || true
-                    echo "Screenshots encontrados:"
-                    find reports/html -name "*.png" -type f || true
-                  else
-                    echo "Diretório reports/html NÃO existe"
-                  fi
-
-            - name: Preparar artefatos brutos
-              if: ${{ always() }}
-              run: |
-                  JOB_DIR="artifacts/job-${{ strategy.job-index }}"
-                  echo "JOB_DIR: $JOB_DIR"
-                  mkdir -p "$JOB_DIR/reports-html/.jsons"
-                  mkdir -p "$JOB_DIR/reports-html"
-
-                  echo "=== VERIFICANDO ORIGEM DOS JSONs ==="
-                  if [ -d reports/html/.jsons ]; then
-                    echo "Diretório reports/html/.jsons existe"
-                    echo "Conteúdo de reports/html/.jsons:"
-                    ls -la reports/html/.jsons || true
-                    echo "Arquivos JSON encontrados na origem:"
-                    find reports/html/.jsons -name "*.json" -type f || true
-                    
-                    echo "=== COPIANDO JSONs ==="
-                    PART_INDEX="${{ strategy.job-index }}"
-                    for json_file in reports/html/.jsons/*.json; do
-                      if [ -f "$json_file" ]; then
-                        filename=$(basename "$json_file")
-                        dest_file="$JOB_DIR/reports-html/.jsons/${PART_INDEX}-${filename}"
-                        echo "Copiando: $json_file -> $dest_file"
-                        cp "$json_file" "$dest_file"
-                      fi
-                    done
-                  else
-                    echo "ERRO: Diretório reports/html/.jsons NÃO existe!"
-                  fi
-
-                  echo "=== VERIFICANDO ORIGEM DOS SCREENSHOTS E ASSETS ==="
-                  if [ -d reports/html ]; then
-                    echo "Diretório reports/html existe"
-                    echo "Copiando screenshots e assets (exceto .jsons que já foi copiado)..."
-                    # Copia tudo exceto .jsons e arquivos JSON na raiz
-                    find reports/html -mindepth 1 -maxdepth 1 ! -name ".jsons" ! -name "*.json" -exec cp -R {} "$JOB_DIR/reports-html/" \; 2>/dev/null || true
-                    echo "Screenshots e assets copiados"
-                  else
-                    echo "Diretório reports/html NÃO existe (normal se não houver falhas)"
-                  fi
-
-                  echo "=== VERIFICAÇÃO FINAL DOS ARQUIVOS COPIADOS ==="
-                  echo "Conteúdo de $JOB_DIR/reports-html/.jsons após cópia:"
-                  ls -la "$JOB_DIR/reports-html/.jsons" || true
-                  echo "JSONs encontrados no destino:"
-                  find "$JOB_DIR/reports-html/.jsons" -name "*.json" -type f || true
-                  echo "Screenshots encontrados no destino:"
-                  find "$JOB_DIR/reports-html" -name "*.png" -type f || true
-                  echo "Estrutura completa de $JOB_DIR:"
-                  find "$JOB_DIR" -type f || true
-
-            - name: Upload parcial
-              if: ${{ always() }}
-              uses: actions/upload-artifact@v4
-              with:
-                  name: cypress-part-${{ strategy.job-index }}
-                  path: artifacts/job-${{ strategy.job-index }}
-                  if-no-files-found: warn
-                  include-hidden-files: true
-
-    reports:
-        name: Consolidar relatórios
-        needs: tests
-        runs-on: ubuntu-latest
+      - name: Auditoria pós-Cypress
         if: ${{ always() }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+        run: |
+          echo "=== LISTANDO reports/html ==="
+          if [ -d reports/html ]; then
+            ls -R reports/html || true
+            echo "Arquivos JSON encontrados:"
+            find reports/html -name "*.json" -maxdepth 3 || true
+            echo "Screenshots encontrados:"
+            find reports/html -name "*.png" -type f || true
+          else
+            echo "Diretório reports/html NÃO existe"
+          fi
 
-            - name: Contexto inicial consolidação
-              run: |
-                  echo "=== CONTEXTO INICIAL CONSOLIDAÇÃO ==="
-                  pwd
-                  echo "Conteúdo do diretório:"
-                  ls -R
+      - name: Preparar artefatos brutos
+        if: ${{ always() }}
+        run: |
+          JOB_DIR="artifacts/job-${{ strategy.job-index }}"
+          echo "JOB_DIR: $JOB_DIR"
+          mkdir -p "$JOB_DIR/reports-html/.jsons"
+          mkdir -p "$JOB_DIR/reports-html"
 
-            - name: Setup Node.js
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 24.11.1
-                  cache: npm
+          echo "=== VERIFICANDO ORIGEM DOS JSONs ==="
+          if [ -d reports/html/.jsons ]; then
+            echo "Diretório reports/html/.jsons existe"
+            echo "Conteúdo de reports/html/.jsons:"
+            ls -la reports/html/.jsons || true
+            echo "Arquivos JSON encontrados na origem:"
+            find reports/html/.jsons -name "*.json" -type f || true
+            
+            echo "=== COPIANDO JSONs ==="
+            PART_INDEX="${{ strategy.job-index }}"
+            for json_file in reports/html/.jsons/*.json; do
+              if [ -f "$json_file" ]; then
+                filename=$(basename "$json_file")
+                dest_file="$JOB_DIR/reports-html/.jsons/${PART_INDEX}-${filename}"
+                echo "Copiando: $json_file -> $dest_file"
+                cp "$json_file" "$dest_file"
+              fi
+            done
+          else
+            echo "ERRO: Diretório reports/html/.jsons NÃO existe!"
+          fi
 
-            - name: Ajustar versão do npm
-              run: npm install -g npm@11.6.3
+          echo "=== VERIFICANDO ORIGEM DOS SCREENSHOTS E ASSETS ==="
+          if [ -d reports/html ]; then
+            echo "Diretório reports/html existe"
+            echo "Copiando screenshots e assets (exceto .jsons que já foi copiado)..."
+            # Copia tudo exceto .jsons e arquivos JSON na raiz
+            find reports/html -mindepth 1 -maxdepth 1 ! -name ".jsons" ! -name "*.json" -exec cp -R {} "$JOB_DIR/reports-html/" \; 2>/dev/null || true
+            echo "Screenshots e assets copiados"
+          else
+            echo "Diretório reports/html NÃO existe (normal se não houver falhas)"
+          fi
 
-            - name: Install dependencies
-              run: npm ci
+          echo "=== VERIFICAÇÃO FINAL DOS ARQUIVOS COPIADOS ==="
+          echo "Conteúdo de $JOB_DIR/reports-html/.jsons após cópia:"
+          ls -la "$JOB_DIR/reports-html/.jsons" || true
+          echo "JSONs encontrados no destino:"
+          find "$JOB_DIR/reports-html/.jsons" -name "*.json" -type f || true
+          echo "Screenshots encontrados no destino:"
+          find "$JOB_DIR/reports-html" -name "*.png" -type f || true
+          echo "Estrutura completa de $JOB_DIR:"
+          find "$JOB_DIR" -type f || true
 
-            - name: Baixar artefatos
-              uses: actions/download-artifact@v4
-              with:
-                  path: downloaded
+      - name: Upload parcial
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-part-${{ strategy.job-index }}
+          path: artifacts/job-${{ strategy.job-index }}
+          if-no-files-found: warn
+          include-hidden-files: true
 
-            - name: Auditoria artefatos baixados
-              run: |
-                  echo "=== LISTANDO downloaded ==="
-                  ls -R downloaded || true
-                  echo "Arquivos JSON de cada parte:"
-                  find downloaded -name "*.json" || true
+  reports:
+    name: Consolidar relatórios
+    needs: tests
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-            - name: Organizar arquivos do mochawesome
-              run: |
-                  rm -rf reports/html
-                  mkdir -p reports/html/.jsons
+      - name: Contexto inicial consolidação
+        run: |
+          echo "=== CONTEXTO INICIAL CONSOLIDAÇÃO ==="
+          pwd
+          echo "Conteúdo do diretório:"
+          ls -R
 
-                  echo "=== PROCESSANDO CADA PARTE BAIXADA ==="
-                  for part in downloaded/cypress-part-*; do
-                    if [ -d "$part" ]; then
-                      echo "Processando: $part"
-                      
-                      if [ -d "$part/reports-html/.jsons" ]; then
-                        echo "  Diretório $part/reports-html/.jsons existe"
-                        echo "  Conteúdo:"
-                        ls -la "$part/reports-html/.jsons" || true
-                        
-                        echo "  Copiando JSONs de $part/reports-html/.jsons para reports/html/.jsons"
-                        PART_NAME=$(basename "$part")
-                        for json_file in "$part/reports-html/.jsons"/*.json; do
-                          if [ -f "$json_file" ]; then
-                            filename=$(basename "$json_file")
-                            dest_file="reports/html/.jsons/${PART_NAME}-${filename}"
-                            echo "    Copiando: $filename -> $dest_file"
-                            cp "$json_file" "$dest_file"
-                          fi
-                        done
-                      else
-                        echo "  AVISO: $part/reports-html/.jsons não existe"
-                      fi
-                      
-                      if [ -d "$part/reports-html" ]; then
-                        echo "  Copiando screenshots e assets de $part/reports-html"
-                        # Copia tudo exceto .jsons (que já foi copiado acima)
-                        find "$part/reports-html" -mindepth 1 -maxdepth 1 ! -name ".jsons" ! -name "*.json" -exec cp -R {} reports/html/ \; 2>/dev/null || true
-                      fi
-                    fi
-                  done
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.11.1
+          cache: npm
 
-                  echo "=== VERIFICAÇÃO FINAL DOS JSONs CONSOLIDADOS ==="
-                  echo "Conteúdo de reports/html/.jsons:"
-                  ls -la reports/html/.jsons || true
-                  echo "Total de JSONs encontrados:"
-                  find reports/html/.jsons -name "*.json" -type f | wc -l || echo "0"
-                  echo "Lista completa de JSONs:"
-                  find reports/html/.jsons -name "*.json" -type f || true
-                  echo "Screenshots encontrados:"
-                  find reports/html -name "*.png" -type f || true
+      - name: Ajustar versão do npm
+        run: npm install -g npm@11.6.3
 
-            - name: Gerar relatório consolidado
-              run: |
-                  echo "JSONs presentes antes do merge:"
-                  find reports/html/.jsons -name "*.json" || true
-                  npm run post-test
-                  echo "=== ESTRUTURA FINAL DE REPORTS/HTML ==="
-                  ls -R reports/html || true
-                  echo "Arquivos HTML gerados:"
-                  find reports/html -maxdepth 2 -name "*.html" || true
+      - name: Install dependencies
+        run: npm ci
 
-            - name: Upload relatório final
-              if: ${{ always() }}
-              uses: actions/upload-artifact@v4
-              with:
-                  name: cypress-report-html
-                  path: reports/html
-                  if-no-files-found: error
-                  include-hidden-files: true
+      - name: Baixar artefatos
+        uses: actions/download-artifact@v4
+        with:
+          path: downloaded
+
+      - name: Auditoria artefatos baixados
+        run: |
+          echo "=== LISTANDO downloaded ==="
+          ls -R downloaded || true
+          echo "Arquivos JSON de cada parte:"
+          find downloaded -name "*.json" || true
+
+      - name: Organizar arquivos do mochawesome
+        run: |
+          rm -rf reports/html
+          mkdir -p reports/html/.jsons
+
+          echo "=== PROCESSANDO CADA PARTE BAIXADA ==="
+          for part in downloaded/cypress-part-*; do
+            if [ -d "$part" ]; then
+              echo "Processando: $part"
+              
+              if [ -d "$part/reports-html/.jsons" ]; then
+                echo "  Diretório $part/reports-html/.jsons existe"
+                echo "  Conteúdo:"
+                ls -la "$part/reports-html/.jsons" || true
+                
+                echo "  Copiando JSONs de $part/reports-html/.jsons para reports/html/.jsons"
+                PART_NAME=$(basename "$part")
+                for json_file in "$part/reports-html/.jsons"/*.json; do
+                  if [ -f "$json_file" ]; then
+                    filename=$(basename "$json_file")
+                    dest_file="reports/html/.jsons/${PART_NAME}-${filename}"
+                    echo "    Copiando: $filename -> $dest_file"
+                    cp "$json_file" "$dest_file"
+                  fi
+                done
+              else
+                echo "  AVISO: $part/reports-html/.jsons não existe"
+              fi
+              
+              if [ -d "$part/reports-html" ]; then
+                echo "  Copiando screenshots e assets de $part/reports-html"
+                # Copia tudo exceto .jsons (que já foi copiado acima)
+                find "$part/reports-html" -mindepth 1 -maxdepth 1 ! -name ".jsons" ! -name "*.json" -exec cp -R {} reports/html/ \; 2>/dev/null || true
+              fi
+            fi
+          done
+
+          echo "=== VERIFICAÇÃO FINAL DOS JSONs CONSOLIDADOS ==="
+          echo "Conteúdo de reports/html/.jsons:"
+          ls -la reports/html/.jsons || true
+          echo "Total de JSONs encontrados:"
+          find reports/html/.jsons -name "*.json" -type f | wc -l || echo "0"
+          echo "Lista completa de JSONs:"
+          find reports/html/.jsons -name "*.json" -type f || true
+          echo "Screenshots encontrados:"
+          find reports/html -name "*.png" -type f || true
+
+      - name: Gerar relatório consolidado
+        run: |
+          echo "JSONs presentes antes do merge:"
+          find reports/html/.jsons -name "*.json" || true
+          npm run post-test
+          echo "=== ESTRUTURA FINAL DE REPORTS/HTML ==="
+          ls -R reports/html || true
+          echo "Arquivos HTML gerados:"
+          find reports/html -maxdepth 2 -name "*.html" || true
+
+      - name: Upload relatório final
+        if: ${{ always() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: cypress-report-html
+          path: reports/html
+          if-no-files-found: error
+          include-hidden-files: true

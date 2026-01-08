@@ -9,141 +9,162 @@ O projeto utiliza tags, divisão de testes em paralelo e mochawesome para gerar 
 Este repositório serve como **guia de referência** para padronização de projetos de automação. Siga estes passos para criar um novo projeto baseado neste template:
 
 1. **📥 Clone ou use como template**:
-
-    - Use este repositório como base para novos projetos de automação
-    - Copie a estrutura de pastas e arquivos de configuração
-    - Mantenha a organização: `cypress/e2e/`, `cypress/api/`, `cypress/support/`
+   - Use este repositório como base para novos projetos de automação
+   - Copie a estrutura de pastas e arquivos de configuração
+   - Mantenha a organização: `cypress/e2e/`, `cypress/api/`, `cypress/support/`
 
 2. **🔧 Configure as variáveis de ambiente**:
-
-    - Copie `cypress.env-example.json` para `cypress.env.json`
-    - Preencha com as credenciais e URLs específicas do seu projeto
-    - Configure secrets no GitHub Actions para CI/CD
+   - Copie `cypress.env-example.json` para `cypress.env.json`
+   - Preencha com as credenciais e URLs específicas do seu projeto
+   - Configure secrets no GitHub Actions para CI/CD
 
 3. **⚙️ Adapte os comandos customizados**:
-
-    - Mantenha a estrutura de `api_commands.js` e `gui_commands.js`
-    - Adapte os comandos para as necessidades específicas do seu projeto
-    - Adicione novos comandos reutilizáveis conforme necessário
+   - Mantenha a estrutura de `api_commands.js` e `gui_commands.js`
+   - Adapte os comandos para as necessidades específicas do seu projeto
+   - Adicione novos comandos reutilizáveis conforme necessário
 
 4. **📊 Mantenha a estrutura de relatórios**:
-
-    - A configuração de relatórios mochawesome já está pronta
-    - Os screenshots são anexados automaticamente em caso de falha
-    - Use `npm run post-test` após execuções paralelas para gerar relatórios consolidados (inclui flatten de screenshots)
+   - A configuração de relatórios mochawesome já está pronta
+   - Os screenshots são anexados automaticamente em caso de falha
+   - Use `npm run post-test` após execuções paralelas para gerar relatórios consolidados (inclui flatten de screenshots)
 
 5. **🐳 Configure o CI/CD**:
-    - Use os scripts `cy:split:*` para paralelização em pipelines
-    - Configure secrets no GitHub Actions conforme documentado abaixo
-    - Ajuste o workflow conforme necessário para seu ambiente
+   - Use os scripts `cy:split:*` para paralelização em pipelines
+   - Configure secrets no GitHub Actions conforme documentado abaixo
+   - Ajuste o workflow conforme necessário para seu ambiente
 
 **✅ Princípios de padronização a seguir**:
 
--   ✅ Manter comandos customizados centralizados em `support/`
--   ✅ Usar tags consistentes para organização (`@login`, `@regressao`, etc.)
--   ✅ Seguir a estrutura de pastas: `e2e/` para UI, `api/` para endpoints
--   ✅ Gerar relatórios consolidados após execuções paralelas
--   ✅ Usar cache de sessão para melhorar performance
+- ✅ Manter comandos customizados centralizados em `support/`
+- ✅ Usar tags consistentes para organização (`@login`, `@regressao`, etc.)
+- ✅ Seguir a estrutura de pastas: `e2e/` para UI, `api/` para endpoints
+- ✅ **Seguir padrão de nomenclatura**: arquivos E2E com prefixo `gui-`, arquivos API com prefixo `api-`
+- ✅ Gerar relatórios consolidados após execuções paralelas
+- ✅ Usar cache de sessão para melhorar performance
+- ✅ Manter código formatado com Prettier (usar `npm run prettier:fix` antes de commits)
 
 ### ✨ Principais recursos
 
--   **🧪 Cypress 15 configurado**: viewport padronizado, `retries` para rodar
-    novamente testes instáveis e `defaultCommandTimeout` ajustado.
--   **🔍 Suporte a `@cypress/grep`**: permite filtrar a execução por tags, tanto
-    em nível de spec quanto em nível de cenário.
--   **🔀 Divisão de execuções com `cypress-split`**: facilita a paralelização em
-    pipelines ou execuções distribuídas.
--   **🔧 Comandos customizados reutilizáveis** em `api_commands` e `gui_commands`
-    para manter as specs mais limpas e legíveis.
--   **📈 Relatórios mochawesome em `reports/html`**, com screenshots incorporados
-    e estrutura pronta para merge dos arquivos `.json`.
--   **🪝 Integração com `test:after:run`** em `cypress/support/e2e.js` para
-    anexar, em cada teste que falha, as screenshots salvas pelo Cypress ao
-    relatório mochawesome.
+- **🧪 Cypress 15 configurado**: viewport padronizado, `retries` para rodar
+  novamente testes instáveis e `defaultCommandTimeout` ajustado.
+- **🔍 Suporte a `@cypress/grep`**: permite filtrar a execução por tags, tanto
+  em nível de spec quanto em nível de cenário.
+- **🔀 Divisão de execuções com `cypress-split`**: facilita a paralelização em
+  pipelines ou execuções distribuídas.
+- **🔧 Comandos customizados reutilizáveis** em `api_commands` e `gui_commands`
+  para manter as specs mais limpas e legíveis.
+- **📈 Relatórios mochawesome em `reports/html`**, com screenshots incorporados
+  e estrutura pronta para merge dos arquivos `.json`.
+- **🪝 Integração com `test:after:run`** em `cypress/support/e2e.js` para
+  anexar, em cada teste que falha, as screenshots salvas pelo Cypress ao
+  relatório mochawesome.
+- **💅 Prettier configurado**: formatação automática de código com configuração
+  padronizada (single quotes, sem ponto e vírgula, tab width 2).
+- **📝 Padrão de nomenclatura**: specs seguem prefixos `gui-` (E2E) e `api-` (API)
+  para facilitar identificação e organização.
 
 ### 📋 Pré-requisitos
 
--   Node.js v24.11.1 (recomendado LTS).
--   npm 11.6.3 (vem com o Node mais recente).
--   Acesso ao Git e ao repositório remoto.
+- Node.js v24.11.1 (recomendado LTS).
+- npm 11.6.3 (vem com o Node mais recente).
+- Acesso ao Git e ao repositório remoto.
 
 ### 🌍 Configuração de variáveis de ambiente
 
 1. **📋 Copie o arquivo de exemplo**:
 
-    ```bash
-    cp cypress.env-example.json cypress.env.json
-    ```
+   ```bash
+   cp cypress.env-example.json cypress.env.json
+   ```
 
 2. **✏️ Preencha as variáveis** no arquivo `cypress.env.json` com suas credenciais:
-    - `USER_EMAIL`: Email do usuário para testes
-    - `USER_PASSWORD`: Senha do usuário
-    - `PRICING_BFF_STAGING_URL`: URL da API de staging
-    - `MADEIRAMADEIRA_PRODUCTION_URL`: URL de produção
-    - `AUTHORIZATION_TOKEN_STAGING`: Token de autenticação (opcional)
+   - `USER_EMAIL`: Email do usuário para testes
+   - `USER_PASSWORD`: Senha do usuário
+   - `PRICING_BFF_STAGING_URL`: URL da API de staging
+   - `MADEIRAMADEIRA_PRODUCTION_URL`: URL de produção
+   - `AUTHORIZATION_TOKEN_STAGING`: Token de autenticação (opcional)
 
 **⚠️ Importante**: O arquivo `cypress.env.json` está no `.gitignore` e não deve ser commitado. Para GitHub Actions, configure as secrets.
+
+### 💅 Formatação de código com Prettier
+
+O projeto utiliza **Prettier** para manter consistência na formatação do código. A configuração está definida no arquivo `.prettierrc`:
+
+- **Single quotes**: aspas simples para strings
+- **Sem ponto e vírgula**: código mais limpo
+- **Tab width 2**: indentação com 2 espaços
+
+**📝 Comandos disponíveis**:
+
+- `npm run prettier:check`: verifica se os arquivos estão formatados corretamente
+- `npm run prettier:fix`: formata automaticamente todos os arquivos do projeto
+
+**💡 Dica**: Execute `npm run prettier:fix` antes de fazer commits para garantir que todo o código está formatado de acordo com o padrão do projeto.
 
 ### ▶️ Como executar
 
 1. **📥 Clonar o repositório e acessar a pasta**:
 
-    ```bash
-    git clone https://github.com/<seu-usuario>/cypress-padronizacao.git
-    cd cypress-padronizacao
-    ```
+   ```bash
+   git clone https://github.com/<seu-usuario>/cypress-padronizacao.git
+   cd cypress-padronizacao
+   ```
 
 2. **📦 Instalar dependências**:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 3. **🎮 Executar os testes no modo interativo**:
 
-    ```bash
-    npm test
-    ```
+   ```bash
+   npm test
+   ```
 
 4. **🤖 Executar os testes em modo headless (CI/local)**:
 
-    ```bash
-    npm run test:headless
-    ```
+   ```bash
+   npm run test:headless
+   ```
 
 ## 📜 Scripts disponíveis (`package.json`)
 
--   **`npm test`**: abre o Cypress Runner (`cypress open`).
--   **`npm run test:headless`**: roda toda a suíte em modo headless (`cypress run`).
--   **`npm run test:headless:login`**: executa apenas cenários marcados com
-    a tag `@login`.
--   **`npm run test:headless:quotation`**: executa apenas cenários marcados com
-    a tag `@quotation`.
--   **`npm run list:spec:names`**: usa `find-cypress-specs --names` para listar
-    os arquivos de spec encontrados.
--   **`npm run count:by:tags`**: usa `find-cypress-specs --tags` para mostrar
-    as tags presentes nas specs.
--   **`npm run cy:split:1|2|3`**: divide a execução total em três fatias usando
-    as variáveis `SPLIT` e `SPLIT_INDEX` (útil para paralelizar em diferentes
-    máquinas ou jobs).
--   **`npm run cy:split:all`**: executa os três splits em paralelo usando
-    `concurrently`.
--   **`npm run merge-reports`**: faz o merge dos arquivos JSON gerados pelo
-    `cypress-mochawesome-reporter` em `reports/html/.jsons`.
--   **`npm run generate-report`**: gera o HTML final de relatório a partir
-    do JSON consolidado.
--   **`npm run flatten-screenshots`**: move screenshots de subdiretórios `api` e `e2e` para o diretório raiz `reports/html/`, facilitando a organização dos arquivos.
--   **`npm run post-test`**: encadeia `flatten-screenshots`, `merge-reports` e `generate-report` após
-    uma execução headless completa.
+- **`npm test`**: abre o Cypress Runner (`cypress open`).
+- **`npm run test:headless`**: roda toda a suíte em modo headless (`cypress run`).
+- **`npm run test:headless:login`**: executa apenas cenários marcados com
+  a tag `@login`.
+- **`npm run test:headless:quotation`**: executa apenas cenários marcados com
+  a tag `@quotation`.
+- **`npm run list:spec:names`**: usa `find-cypress-specs --names` para listar
+  os arquivos de spec encontrados.
+- **`npm run count:by:tags`**: usa `find-cypress-specs --tags` para mostrar
+  as tags presentes nas specs.
+- **`npm run cy:split:1|2|3`**: divide a execução total em três fatias usando
+  as variáveis `SPLIT` e `SPLIT_INDEX` (útil para paralelizar em diferentes
+  máquinas ou jobs).
+- **`npm run cy:split:all`**: executa os três splits em paralelo usando
+  `concurrently`.
+- **`npm run merge-reports`**: faz o merge dos arquivos JSON gerados pelo
+  `cypress-mochawesome-reporter` em `reports/html/.jsons`.
+- **`npm run generate-report`**: gera o HTML final de relatório a partir
+  do JSON consolidado.
+- **`npm run flatten-screenshots`**: move screenshots de subdiretórios `api` e `e2e` para o diretório raiz `reports/html/`, facilitando a organização dos arquivos.
+- **`npm run post-test`**: encadeia `flatten-screenshots`, `merge-reports` e `generate-report` após
+  uma execução headless completa.
+- **`npm run prettier:check`**: verifica se os arquivos estão formatados corretamente conforme o Prettier.
+- **`npm run prettier:fix`**: formata automaticamente todos os arquivos do projeto usando o Prettier.
 
 ## 📁 Estrutura relevante do projeto
 
 ```
 cypress/
  ├─ e2e/                 # Testes E2E (UI) - fluxos completos de interface
- │   └─ login.cy.js
+ │   ├─ gui-login.cy.js
+ │   ├─ gui-login-session-1.cy.js
+ │   └─ gui-login-session-2.cy.js
  ├─ api/                 # Testes de API - validação direta de endpoints
- │   └─ quotation.cy.js
+ │   └─ api-quotation.cy.js
  ├─ fixtures/            # Massas de dados estáticas (ex.: users.json)
  └─ support/
      ├─ e2e.js           # Bootstrap global dos testes E2E (hooks, plugins, estilos)
@@ -153,76 +174,75 @@ reports/
  └─ html/                # Saída do mochawesome (JSON, HTML, assets e screenshots)
 cypress.config.js        # Configurações gerais de e2e, reporter e plugins
 package.json             # Scripts e dependências do projeto
+.prettierrc              # Configuração do Prettier para formatação de código
 ```
 
 ### 🗂️ Organização de testes
 
--   **`cypress/e2e/`**: testes end-to-end que simulam o uso da aplicação pela
-    interface.
+- **`cypress/e2e/`**: testes end-to-end que simulam o uso da aplicação pela
+  interface.
+  - Utilizam comandos como `cy.visit()`, `cy.get()`, `cy.click()`, `cy.type()`.
+  - Validam fluxos completos, como login e navegação básica.
+  - **📝 Padrão de nomenclatura**: arquivos devem seguir o prefixo `gui-` (ex: `gui-login.cy.js`, `gui-login-session-1.cy.js`).
 
-    -   Utilizam comandos como `cy.visit()`, `cy.get()`, `cy.click()`, `cy.type()`.
-    -   Validam fluxos completos, como login e navegação básica.
-
--   **`cypress/api/`**: testes que exercitam diretamente a API.
-    -   Utilizam `cy.api()` / `cy.request()` (via `cypress-plugin-api`).
-    -   Validam status code, schema e dados de resposta (ex.: cotação de frete).
+- **`cypress/api/`**: testes que exercitam diretamente a API.
+  - Utilizam `cy.api()` / `cy.request()` (via `cypress-plugin-api`).
+  - Validam status code, schema e dados de resposta (ex.: cotação de frete).
+  - **📝 Padrão de nomenclatura**: arquivos devem seguir o prefixo `api-` (ex: `api-quotation.cy.js`).
 
 ### ❓ Como decidir onde colocar um teste?
 
 Use estas perguntas para ajudar na decisão:
 
 1. **🌐 O teste precisa abrir um navegador?**
-
-    - ✅ Sim → `cypress/e2e/`
-    - ❌ Não → `cypress/api/`
+   - ✅ Sim → `cypress/e2e/`
+   - ❌ Não → `cypress/api/`
 
 2. **👁️ O teste interage com elementos visuais?**
-
-    - ✅ Sim → `cypress/e2e/`
-    - ❌ Não → `cypress/api/`
+   - ✅ Sim → `cypress/e2e/`
+   - ❌ Não → `cypress/api/`
 
 3. **🔌 O teste valida apenas a resposta de uma API?**
-
-    - ✅ Sim → `cypress/api/`
-    - ❌ Não → `cypress/e2e/`
+   - ✅ Sim → `cypress/api/`
+   - ❌ Não → `cypress/e2e/`
 
 4. **👤 O teste simula um fluxo completo do usuário?**
-    - ✅ Sim → `cypress/e2e/`
-    - ❌ Não → Considere `cypress/api/`
+   - ✅ Sim → `cypress/e2e/`
+   - ❌ Não → Considere `cypress/api/`
 
 ## 📋 Fluxo de relatórios e screenshots
 
 ### ⚙️ Configuração no `cypress.config.js`
 
--   **Reporter**: `cypress-mochawesome-reporter`.
--   **Opções principais**:
-    -   `reportDir: "reports/html/"`.
-    -   `embeddedScreenshots: true` para incorporar screenshots no HTML.
-    -   `json: true` para gerar arquivos `.json` utilizáveis no merge posterior.
--   **🖼️ Screenshots**: a pasta padrão de screenshots foi configurada como
-    `screenshotsFolder: "reports/html/"`, de forma que todas as imagens fiquem
-    junto dos JSON e do HTML final.
+- **Reporter**: `cypress-mochawesome-reporter`.
+- **Opções principais**:
+  - `reportDir: "reports/html/"`.
+  - `embeddedScreenshots: true` para incorporar screenshots no HTML.
+  - `json: true` para gerar arquivos `.json` utilizáveis no merge posterior.
+- **🖼️ Screenshots**: a pasta padrão de screenshots foi configurada como
+  `screenshotsFolder: "reports/html/"`, de forma que todas as imagens fiquem
+  junto dos JSON e do HTML final.
 
 ### 🪝 Hook `test:after:run` em `cypress/support/e2e.js`
 
--   O arquivo `e2e.js` registra um listener:
-    -   **Evento**: `Cypress.on('test:after:run', (test, runnable) => { ... })`.
-    -   **Comportamento**:
-        -   Se o teste **não** falhou (`test.state !== 'failed'`), nada é feito.
-        -   Quando o teste falha, o código:
-            -   Descobre o nome do arquivo de spec atual (`Cypress.spec.name`,
-                por exemplo `login.cy.js`).
-            -   Monta o caminho base da pasta de screenshots dentro de
-                `reports/html/<specName>/`.
-            -   Adiciona ao relatório mochawesome:
-                -   A screenshot da última tentativa que realmente falhou:
-                    `./<specName>/<suite> -- <titulo do teste> (failed).png`.
-                -   (Opcionalmente) também as screenshots das tentativas
-                    anteriores de retry, seguindo o padrão:
-                    `(...failed) (attempt 2).png`, `(...failed) (attempt 3).png`, etc.
-        -   A associação é feita usando `addContext` de `mochawesome/addContext`,
-            que injeta os caminhos das imagens diretamente no contexto do teste
-            dentro do relatório.
+- O arquivo `e2e.js` registra um listener:
+  - **Evento**: `Cypress.on('test:after:run', (test, runnable) => { ... })`.
+  - **Comportamento**:
+    - Se o teste **não** falhou (`test.state !== 'failed'`), nada é feito.
+    - Quando o teste falha, o código:
+      - Descobre o nome do arquivo de spec atual (`Cypress.spec.name`,
+        por exemplo `gui-login.cy.js` ou `api-quotation.cy.js`).
+      - Monta o caminho base da pasta de screenshots dentro de
+        `reports/html/<specName>/`.
+      - Adiciona ao relatório mochawesome:
+        - A screenshot da última tentativa que realmente falhou:
+          `./<specName>/<suite> -- <titulo do teste> (failed).png`.
+        - (Opcionalmente) também as screenshots das tentativas
+          anteriores de retry, seguindo o padrão:
+          `(...failed) (attempt 2).png`, `(...failed) (attempt 3).png`, etc.
+    - A associação é feita usando `addContext` de `mochawesome/addContext`,
+      que injeta os caminhos das imagens diretamente no contexto do teste
+      dentro do relatório.
 
 Com isso, ao abrir o HTML gerado pelo mochawesome (`merged-report.html` ou
 `report-generated.html`) você consegue visualizar, para cada teste que falhou,
@@ -234,30 +254,29 @@ externas para ajustar os caminhos.
 1. **🔀 Rodar os testes em paralelo com `cypress-split`**  
    Use o script que executa todos os splits em paralelo:
 
-    ```bash
-    npm run cy:split:all
-    ```
+   ```bash
+   npm run cy:split:all
+   ```
 
-    Esse comando usa `concurrently` para disparar `cy:split:1`, `cy:split:2` e
-    `cy:split:3` ao mesmo tempo, cada um rodando uma fatia diferente das specs.
-    Ao final, você terá múltiplos arquivos `.json` de relatório mochawesome
-    gerados em `reports/html/.jsons`, além das screenshots em `reports/html`.
+   Esse comando usa `concurrently` para disparar `cy:split:1`, `cy:split:2` e
+   `cy:split:3` ao mesmo tempo, cada um rodando uma fatia diferente das specs.
+   Ao final, você terá múltiplos arquivos `.json` de relatório mochawesome
+   gerados em `reports/html/.jsons`, além das screenshots em `reports/html`.
 
 2. **🔗 Merge dos relatórios e geração do HTML final**  
    Após a execução paralela, use o script que já faz o merge e gera o relatório
    final em uma única etapa:
 
-    ```bash
-    npm run post-test
-    ```
+   ```bash
+   npm run post-test
+   ```
 
-    Esse comando:
-
-    - chama internamente `flatten-screenshots` para organizar screenshots de subdiretórios `api` e `e2e` no diretório raiz `reports/html/`;
-    - chama `merge-reports` para consolidar todos os `.json`
-      gerados em um único arquivo `merged-report.json`;
-    - chama `generate-report` para produzir o HTML final (por exemplo,
-      `merged-report.html`) dentro de `reports/html`.
+   Esse comando:
+   - chama internamente `flatten-screenshots` para organizar screenshots de subdiretórios `api` e `e2e` no diretório raiz `reports/html/`;
+   - chama `merge-reports` para consolidar todos os `.json`
+     gerados em um único arquivo `merged-report.json`;
+   - chama `generate-report` para produzir o HTML final (por exemplo,
+     `merged-report.html`) dentro de `reports/html`.
 
 Os relatórios consolidados ficam em `reports/html` e podem ser usados em
 pipelines de CI, anexados manualmente em issues ou simplesmente abertos
@@ -280,16 +299,16 @@ O projeto utiliza `cy.session` para cachear sessões de login entre testes, melh
 
 **📝 Observando os logs do Cypress:**
 
--   **Primeira execução (cria sessão):**
+- **Primeira execução (cria sessão):**
 
-    ```
-    ✓ Saved session: user@example.com
-    ```
+  ```
+  ✓ Saved session: user@example.com
+  ```
 
--   **Execuções subsequentes (reutiliza sessão):**
-    ```
-    ✓ Restored session: user@example.com
-    ```
+- **Execuções subsequentes (reutiliza sessão):**
+  ```
+  ✓ Restored session: user@example.com
+  ```
 
 **⏱️ Teste comparativo de tempo:**
 
@@ -308,20 +327,22 @@ Com `cacheAcrossSpecs: true` configurado, a sessão pode ser reutilizada entre s
 
 ### 🔧 Troubleshooting
 
--   **Sempre cria nova sessão**: Verifique se `cacheSession: true` está sendo usado e se a função `validate` não está falhando.
--   **Sessões se misturam entre usuários**: O `sessionId` é baseado no email do usuário, garantindo isolamento por usuário.
+- **Sempre cria nova sessão**: Verifique se `cacheSession: true` está sendo usado e se a função `validate` não está falhando.
+- **Sessões se misturam entre usuários**: O `sessionId` é baseado no email do usuário, garantindo isolamento por usuário.
 
 ## ⭐ Boas práticas sugeridas
 
--   **🔧 Centralizar comandos**: concentre ações repetitivas em `gui_commands.js`
-    e `api_commands.js`, mantendo as specs mais legíveis.
--   **🏷️ Usar tags de forma consistente**: ex.: `@regressao`, `@critico`,
-    `@sanidade`, `@login`, `@quotation`.
--   **📸 Padronizar evidências**: aproveitar o hook `test:after:run` para sempre
-    anexar screenshots de falhas ao relatório.
--   **⚡ Paralelizar quando possível**: usar `cypress-split` e os scripts
-    `cy:split:*` para reduzir o tempo total de execução.
--   **💾 Usar cache de sessão**: aproveitar `cy.session` para reduzir tempo de execução em testes que requerem autenticação.
+- **🔧 Centralizar comandos**: concentre ações repetitivas em `gui_commands.js`
+  e `api_commands.js`, mantendo as specs mais legíveis.
+- **🏷️ Usar tags de forma consistente**: ex.: `@regressao`, `@critico`,
+  `@sanidade`, `@login`, `@quotation`.
+- **📝 Seguir padrão de nomenclatura**: use prefixo `gui-` para specs E2E e `api-` para specs de API (ex: `gui-login.cy.js`, `api-quotation.cy.js`).
+- **💅 Manter código formatado**: execute `npm run prettier:fix` antes de fazer commits para garantir formatação consistente.
+- **📸 Padronizar evidências**: aproveitar o hook `test:after:run` para sempre
+  anexar screenshots de falhas ao relatório.
+- **⚡ Paralelizar quando possível**: usar `cypress-split` e os scripts
+  `cy:split:*` para reduzir o tempo total de execução.
+- **💾 Usar cache de sessão**: aproveitar `cy.session` para reduzir tempo de execução em testes que requerem autenticação.
 
 ## 🐙 GitHub Actions / CI/CD
 
@@ -333,13 +354,15 @@ Para que os testes funcionem no GitHub Actions, é necessário configurar as seg
 
 1. Acesse: **Settings** → **Secrets and variables** → **Actions**
 2. Adicione cada uma das seguintes secrets:
-    - `USER_EMAIL`
-    - `USER_PASSWORD`
-    - `PRICING_BFF_STAGING_URL`
-    - `MADEIRAMADEIRA_PRODUCTION_URL`
-    - `AUTHORIZATION_TOKEN_STAGING`
+   - `USER_EMAIL`
+   - `USER_PASSWORD`
+   - `PRICING_BFF_STAGING_URL`
+   - `MADEIRAMADEIRA_PRODUCTION_URL`
+   - `AUTHORIZATION_TOKEN_STAGING`
 
 ## 📌 Notas importantes
 
--   **Testes intencionalmente falhos**: Alguns testes nas specs de exemplo (`login.cy.js` e `quotation.cy.js`) são intencionalmente falhos para demonstrar retries e screenshots no relatório. Eles estão marcados com a tag `@example-fail` e podem ser filtrados em pipelines reais.
--   **Variáveis de ambiente**: Nunca commite o arquivo `cypress.env.json` com credenciais reais. Use `cypress.env-example.json` como template e configure secrets no GitHub Actions.
+- **Testes intencionalmente falhos**: Alguns testes nas specs de exemplo (`gui-login.cy.js` e `api-quotation.cy.js`) são intencionalmente falhos para demonstrar retries e screenshots no relatório. Eles estão marcados com a tag `@example-fail` e podem ser filtrados em pipelines reais.
+- **Variáveis de ambiente**: Nunca commite o arquivo `cypress.env.json` com credenciais reais. Use `cypress.env-example.json` como template e configure secrets no GitHub Actions.
+- **Formatação de código**: O projeto utiliza Prettier para manter consistência na formatação. Execute `npm run prettier:fix` antes de commits ou configure seu editor para formatar automaticamente ao salvar.
+- **Padrão de nomenclatura**: Todos os arquivos de spec devem seguir o padrão de prefixo (`gui-` para E2E, `api-` para API) para facilitar identificação e organização dos testes.

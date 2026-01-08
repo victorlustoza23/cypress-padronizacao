@@ -8,24 +8,24 @@ const reportsDir = path.join('reports', 'html')
  * Suporta: api/e2e/subpasta/spec.cy.js → spec.cy.js
  */
 function flattenSpecFolders(dir) {
-	if (!fs.existsSync(dir)) return
+  if (!fs.existsSync(dir)) return
 
-	fs.readdirSync(dir, { withFileTypes: true })
-		.filter((item) => item.isDirectory() && item.name.endsWith('.cy.js'))
-		.forEach((item) => {
-			const specFrom = path.join(dir, item.name)
-			const specTo = path.join(reportsDir, item.name)
+  fs.readdirSync(dir, { withFileTypes: true })
+    .filter((item) => item.isDirectory() && item.name.endsWith('.cy.js'))
+    .forEach((item) => {
+      const specFrom = path.join(dir, item.name)
+      const specTo = path.join(reportsDir, item.name)
 
-			if (!fs.existsSync(specTo)) {
-				console.log(`📁 Movendo: ${specFrom} → ${specTo}`)
-				fs.renameSync(specFrom, specTo)
-			}
-		})
+      if (!fs.existsSync(specTo)) {
+        console.log(`📁 Movendo: ${specFrom} → ${specTo}`)
+        fs.renameSync(specFrom, specTo)
+      }
+    })
 
-	// Chama recursivamente em subpastas
-	fs.readdirSync(dir, { withFileTypes: true })
-		.filter((item) => item.isDirectory() && !item.name.endsWith('.cy.js'))
-		.forEach((item) => flattenSpecFolders(path.join(dir, item.name)))
+  // Chama recursivamente em subpastas
+  fs.readdirSync(dir, { withFileTypes: true })
+    .filter((item) => item.isDirectory() && !item.name.endsWith('.cy.js'))
+    .forEach((item) => flattenSpecFolders(path.join(dir, item.name)))
 }
 
 // Executa em toda árvore reports/html/
@@ -33,17 +33,17 @@ flattenSpecFolders(reportsDir)
 
 // Limpa pastas vazias
 function cleanEmptyDirs(dir) {
-	fs.readdirSync(dir, { withFileTypes: true })
-		.filter((item) => item.isDirectory())
-		.forEach((item) => {
-			const fullPath = path.join(dir, item.name)
-			cleanEmptyDirs(fullPath)
+  fs.readdirSync(dir, { withFileTypes: true })
+    .filter((item) => item.isDirectory())
+    .forEach((item) => {
+      const fullPath = path.join(dir, item.name)
+      cleanEmptyDirs(fullPath)
 
-			if (fs.readdirSync(fullPath).length === 0) {
-				console.log(`🗑️  Removendo pasta vazia: ${fullPath}`)
-				fs.rmdirSync(fullPath)
-			}
-		})
+      if (fs.readdirSync(fullPath).length === 0) {
+        console.log(`🗑️  Removendo pasta vazia: ${fullPath}`)
+        fs.rmdirSync(fullPath)
+      }
+    })
 }
 
 cleanEmptyDirs(reportsDir)

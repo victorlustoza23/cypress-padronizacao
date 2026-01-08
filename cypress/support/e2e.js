@@ -38,38 +38,44 @@ import addContext from 'mochawesome/addContext'
  * facilitando debugging de testes instáveis que falham após retries.
  */
 Cypress.on('test:after:run', (test, runnable) => {
-	// Ignora testes que passaram
-	if (test.state !== 'failed') return
+  // Ignora testes que passaram
+  if (test.state !== 'failed') return
 
-	const specName = Cypress.spec.name // ex: login.cy.js
-	const base = `./${specName}` // pasta: reports/html/login.cy.js
+  const specName = Cypress.spec.name // ex: login.cy.js
+  const base = `./${specName}` // pasta: reports/html/login.cy.js
 
-	// Screenshot da tentativa final (a que aparece no log principal do Cypress)
-	const last = `${base}/${runnable.parent.title} -- ${test.title} (failed).png`
-	addContext({ test }, { title: 'Failed screenshot (last attempt)', value: last })
+  // Screenshot da tentativa final (a que aparece no log principal do Cypress)
+  const last = `${base}/${runnable.parent.title} -- ${test.title} (failed).png`
+  addContext(
+    { test },
+    { title: 'Failed screenshot (last attempt)', value: last },
+  )
 
-	// Screenshots das tentativas anteriores (retries), se existirem
-	// test.currentRetry indica quantas vezes o teste foi executado antes de falhar definitivamente
-	for (let attempt = 2; attempt <= test.currentRetry + 1; attempt++) {
-		const shot = `${base}/${runnable.parent.title} -- ${test.title} (failed) (attempt ${attempt}).png`
-		addContext({ test }, { title: `Failed screenshot (attempt ${attempt - 1})`, value: shot })
-	}
+  // Screenshots das tentativas anteriores (retries), se existirem
+  // test.currentRetry indica quantas vezes o teste foi executado antes de falhar definitivamente
+  for (let attempt = 2; attempt <= test.currentRetry + 1; attempt++) {
+    const shot = `${base}/${runnable.parent.title} -- ${test.title} (failed) (attempt ${attempt}).png`
+    addContext(
+      { test },
+      { title: `Failed screenshot (attempt ${attempt - 1})`, value: shot },
+    )
+  }
 })
 
 Cypress.on('uncaught:exception', (err, runnable) => {
-	// Ignora só o “Script error” de cross‑origin
-	if (err.message.includes('Script error')) {
-		return false // Não falha o teste
-	}
+  // Ignora só o “Script error” de cross‑origin
+  if (err.message.includes('Script error')) {
+    return false // Não falha o teste
+  }
 
-	// Para qualquer outro erro, deixa o teste falhar normalmente
-	return true
+  // Para qualquer outro erro, deixa o teste falhar normalmente
+  return true
 })
 
 const app = window.top
 if (!app.document.head.querySelector('[data-hide-command-log-request]')) {
-	const style = app.document.createElement('style')
-	style.innerHTML = `
+  const style = app.document.createElement('style')
+  style.innerHTML = `
   .command-name-request,
   .command-name-xhr,
   .command-name-page-load,
@@ -106,6 +112,6 @@ if (!app.document.head.querySelector('[data-hide-command-log-request]')) {
   color: white !important;
   }
   `
-	style.setAttribute('data-hide-command-log-request', '')
-	app.document.head.appendChild(style)
+  style.setAttribute('data-hide-command-log-request', '')
+  app.document.head.appendChild(style)
 }
