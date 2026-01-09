@@ -3,6 +3,10 @@ describe('Login example spec - login-session-1.cy.js', () => {
   const password = Cypress.env('USER_PASSWORD')
   const options = { cacheSession: false }
 
+  beforeEach(() => {
+    cy.gui_setupUserAgent()
+  })
+
   it('Validate login on MadeiraMadeira', { tags: '@login' }, () => {
     cy.gui_login(user, password, options)
 

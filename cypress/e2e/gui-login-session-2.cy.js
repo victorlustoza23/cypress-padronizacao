@@ -3,6 +3,10 @@ describe('Login2 - Validate cacheAcrossSpecs - login-session-2.cy.js', () => {
   const password = Cypress.env('USER_PASSWORD')
   const options = { cacheSession: true }
 
+  beforeEach(() => {
+    cy.gui_setupUserAgent()
+  })
+
   it(
     'Validate session is reused from login.cy.js (cacheAcrossSpecs)',
     { tags: '@login' },
