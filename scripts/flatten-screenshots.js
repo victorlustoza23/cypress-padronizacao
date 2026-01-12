@@ -5,7 +5,8 @@ const reportsDir = path.join('reports', 'html')
 
 /**
  * Move RECURSIVAMENTE qualquer pasta *.cy.js para reports/html/*.cy.js/
- * Suporta: api/e2e/subpasta/spec.cy.js → spec.cy.js
+ * Suporta: api/api-quotation.cy.js → reports/html/api-quotation.cy.js/
+ *          e2e/gui-login.cy.js → reports/html/gui-login.cy.js/
  */
 function flattenSpecFolders(dir) {
   if (!fs.existsSync(dir)) return

@@ -73,7 +73,7 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
             isFormUrlEncoded: false,
             originalContentType: contentType || 'application/json',
           }
-        } catch (e) {}
+        } catch (e) { }
       }
 
       try {

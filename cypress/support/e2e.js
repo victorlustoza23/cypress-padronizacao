@@ -33,6 +33,8 @@ import addContext from 'mochawesome/addContext'
  * reports/html/<specName>/<suite> -- <teste> (failed).png
  * reports/html/<specName>/<suite> -- <teste> (failed) (attempt 2).png
  * reports/html/<specName>/<suite> -- <teste> (failed) (attempt 3).png
+ * 
+ * Exemplos de specName: gui-login.cy.js, gui-login-session-1.cy.js, api-quotation.cy.js
  *
  * Isso permite visualizar no relatório HTML todas as tentativas de um teste que falhou,
  * facilitando debugging de testes instáveis que falham após retries.
@@ -41,8 +43,8 @@ Cypress.on('test:after:run', (test, runnable) => {
   // Ignora testes que passaram
   if (test.state !== 'failed') return
 
-  const specName = Cypress.spec.name // ex: login.cy.js
-  const base = `./${specName}` // pasta: reports/html/login.cy.js
+  const specName = Cypress.spec.name // ex: gui-login.cy.js ou api-quotation.cy.js
+  const base = `./${specName}` // pasta: reports/html/gui-login.cy.js ou reports/html/api-quotation.cy.js
 
   // Screenshot da tentativa final (a que aparece no log principal do Cypress)
   const last = `${base}/${runnable.parent.title} -- ${test.title} (failed).png`

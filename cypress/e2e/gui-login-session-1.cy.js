@@ -1,4 +1,4 @@
-describe('Login example spec - login-session-1.cy.js', () => {
+describe('Login example spec - gui-login-session-1.cy.js', () => {
   const user = Cypress.env('USER_EMAIL')
   const password = Cypress.env('USER_PASSWORD')
   const options = { cacheSession: false }
