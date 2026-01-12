@@ -24,10 +24,7 @@ export default defineConfig({
       runMode: 2,
       openMode: 2,
     },
-    specPattern: [
-      'cypress/e2e/**/*.cy.{js,jsx,ts,tsx}',
-      'cypress/api/**/*.cy.{js,jsx,ts,tsx}',
-    ],
+    specPattern: ['cypress/e2e/**/*.cy.{js,jsx,ts,tsx}', 'cypress/api/**/*.cy.{js,jsx,ts,tsx}'],
     supportFile: 'cypress/support/e2e.js',
     viewportHeight: 1000,
     viewportWidth: 1280,

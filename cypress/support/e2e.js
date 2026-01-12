@@ -33,7 +33,7 @@ import addContext from 'mochawesome/addContext'
  * reports/html/<specName>/<suite> -- <teste> (failed).png
  * reports/html/<specName>/<suite> -- <teste> (failed) (attempt 2).png
  * reports/html/<specName>/<suite> -- <teste> (failed) (attempt 3).png
- * 
+ *
  * Exemplos de specName: gui-login.cy.js, gui-login-session-1.cy.js, api-quotation.cy.js
  *
  * Isso permite visualizar no relatório HTML todas as tentativas de um teste que falhou,
@@ -48,19 +48,13 @@ Cypress.on('test:after:run', (test, runnable) => {
 
   // Screenshot da tentativa final (a que aparece no log principal do Cypress)
   const last = `${base}/${runnable.parent.title} -- ${test.title} (failed).png`
-  addContext(
-    { test },
-    { title: 'Failed screenshot (last attempt)', value: last },
-  )
+  addContext({ test }, { title: 'Failed screenshot (last attempt)', value: last })
 
   // Screenshots das tentativas anteriores (retries), se existirem
   // test.currentRetry indica quantas vezes o teste foi executado antes de falhar definitivamente
   for (let attempt = 2; attempt <= test.currentRetry + 1; attempt++) {
     const shot = `${base}/${runnable.parent.title} -- ${test.title} (failed) (attempt ${attempt}).png`
-    addContext(
-      { test },
-      { title: `Failed screenshot (attempt ${attempt - 1})`, value: shot },
-    )
+    addContext({ test }, { title: `Failed screenshot (attempt ${attempt - 1})`, value: shot })
   }
 })
 

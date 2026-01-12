@@ -1,45 +1,38 @@
-Cypress.Commands.add(
-  'gui_login',
-  (
-    user = Cypress.env('USER_EMAIL'),
-    password = Cypress.env('USER_PASSWORD'),
-    { cacheSession = true } = {},
-  ) => {
-    let sessionId = null
+Cypress.Commands.add('gui_login', (user = Cypress.env('USER_EMAIL'), password = Cypress.env('USER_PASSWORD'), { cacheSession = true } = {}) => {
+  let sessionId = null
 
-    const login = () => {
-      cy.visit(`${Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL')}/verificar`, {
-        timeout: 7000,
-      })
-      cy.contains('Concordar e fechar').should('be.visible').click()
-      cy.get('[type="text"]').type(user, { log: false })
-      cy.contains('Continuar').click()
-      cy.get('[type="password"]').type(password, { log: false })
-      cy.contains('Continuar').click()
-      cy.get('[data-icon="xmark"]').click()
-      cy.contains('Minha Conta').should('be.visible')
-    }
+  const login = () => {
+    cy.visit(`${Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL')}/verificar`, {
+      timeout: 7000,
+    })
+    cy.contains('Concordar e fechar').should('be.visible').click()
+    cy.get('[type="text"]').type(user, { log: false })
+    cy.contains('Continuar').click()
+    cy.get('[type="password"]').type(password, { log: false })
+    cy.contains('Continuar').click()
+    cy.get('[data-icon="xmark"]').click()
+    cy.contains('Minha Conta').should('be.visible')
+  }
 
-    const validate = () => {
-      cy.visit(Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL'))
-      cy.contains('Minha Conta').should('be.visible')
-    }
+  const validate = () => {
+    cy.visit(Cypress.env('MADEIRAMADEIRA_PRODUCTION_URL'))
+    cy.contains('Minha Conta').should('be.visible')
+  }
 
-    const options = {
-      cacheAcrossSpecs: true,
-      validate,
-    }
+  const options = {
+    cacheAcrossSpecs: true,
+    validate,
+  }
 
-    if (cacheSession) {
-      if (!sessionId) {
-        sessionId = `gui_session_v1_${user}`
-      }
-      cy.session(sessionId, login, options)
-    } else {
-      login()
+  if (cacheSession) {
+    if (!sessionId) {
+      sessionId = `gui_session_v1_${user}`
     }
-  },
-)
+    cy.session(sessionId, login, options)
+  } else {
+    login()
+  }
+})
 
 Cypress.Commands.add('gui_loginValidation', () => {
   cy.contains('Minha Conta').should('be.visible').click()
@@ -62,8 +55,7 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
     }
 
     if (typeof body === 'string') {
-      const looksLikeJson =
-        body.trim().startsWith('{') || body.trim().startsWith('[')
+      const looksLikeJson = body.trim().startsWith('{') || body.trim().startsWith('[')
 
       if (looksLikeJson) {
         try {
@@ -73,7 +65,7 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
             isFormUrlEncoded: false,
             originalContentType: contentType || 'application/json',
           }
-        } catch (e) { }
+        } catch (e) {}
       }
 
       try {
@@ -85,16 +77,10 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
         return {
           data,
           isFormUrlEncoded: true,
-          originalContentType:
-            contentType || 'application/x-www-form-urlencoded',
+          originalContentType: contentType || 'application/x-www-form-urlencoded',
         }
       } catch (e) {
-        console.log(
-          '[parseRequestBody] Erro ao parsear body:',
-          e.message,
-          '| Body:',
-          body.substring(0, 100),
-        )
+        console.log('[parseRequestBody] Erro ao parsear body:', e.message, '| Body:', body.substring(0, 100))
         return {
           data: body,
           isFormUrlEncoded: false,
@@ -131,24 +117,16 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 
     if (req.body) {
       try {
-        const contentType =
-          req.headers['content-type'] || req.headers['Content-Type']
+        const contentType = req.headers['content-type'] || req.headers['Content-Type']
         const parsed = parseRequestBody(req.body, contentType)
 
         if (parsed && parsed.data) {
           parsed.data.requestToken = castleBrowserToken
           req.body = serializeRequestBody(parsed.data, parsed.isFormUrlEncoded)
-          req.headers['content-type'] =
-            parsed.originalContentType ||
-            (parsed.isFormUrlEncoded
-              ? 'application/x-www-form-urlencoded'
-              : 'application/json')
+          req.headers['content-type'] = parsed.originalContentType || (parsed.isFormUrlEncoded ? 'application/x-www-form-urlencoded' : 'application/json')
         }
       } catch (e) {
-        console.error(
-          '[verify-customer-email] Erro ao modificar body:',
-          e.message,
-        )
+        console.error('[verify-customer-email] Erro ao modificar body:', e.message)
         console.error('[verify-customer-email] Stack:', e.stack)
       }
     }
@@ -159,18 +137,13 @@ Cypress.Commands.add('gui_setupUserAgent', () => {
 
     if (req.body) {
       try {
-        const contentType =
-          req.headers['content-type'] || req.headers['Content-Type']
+        const contentType = req.headers['content-type'] || req.headers['Content-Type']
         const parsed = parseRequestBody(req.body, contentType)
 
         if (parsed && parsed.data) {
           parsed.data.token = castleBrowserToken
           req.body = serializeRequestBody(parsed.data, parsed.isFormUrlEncoded)
-          req.headers['content-type'] =
-            parsed.originalContentType ||
-            (parsed.isFormUrlEncoded
-              ? 'application/x-www-form-urlencoded'
-              : 'application/json')
+          req.headers['content-type'] = parsed.originalContentType || (parsed.isFormUrlEncoded ? 'application/x-www-form-urlencoded' : 'application/json')
         }
       } catch (e) {
         console.error('[customerAuth] Erro ao modificar body:', e.message)

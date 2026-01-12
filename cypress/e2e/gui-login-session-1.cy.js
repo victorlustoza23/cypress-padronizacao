@@ -21,14 +21,10 @@ describe('Login example spec - gui-login-session-1.cy.js', () => {
     cy.gui_loginValidation()
   })
 
-  it(
-    'Validate error message login on MadeiraMadeira',
-    { tags: '@example-fail' },
-    () => {
-      cy.gui_login(user, password, options)
+  it('Validate error message login on MadeiraMadeira', { tags: '@example-fail' }, () => {
+    cy.gui_login(user, password, options)
 
-      cy.contains('Minha Conta').should('be.visible').click()
-      cy.contains('span', 'Sairr').should('be.visible')
-    },
-  )
+    cy.contains('Minha Conta').should('be.visible').click()
+    cy.contains('span', 'Sairr').should('be.visible')
+  })
 })
